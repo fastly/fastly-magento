@@ -1,0 +1,522 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Fastly CDN for Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Fastly CDN for Magento End User License Agreement
+ * that is bundled with this package in the file LICENSE_FASTLY_CDN.txt.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Fastly CDN to newer
+ * versions in the future. If you wish to customize this module for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    Fastly
+ * @package     Fastly_CDN
+ * @copyright   Copyright (c) 2015 Fastly, Inc. (http://www.fastly.com)
+ * @license     BSD, see LICENSE_FASTLY_CDN.txt
+ */
+-->
+<config>
+    <modules>
+        <Fastly_CDN>
+            <version>1.0.0</version>
+        </Fastly_CDN>
+    </modules>
+    <global>
+        <models>
+            <fastlycdn>
+                <class>Fastly_CDN_Model</class>
+                <resourceModel>fastlycdn_resource_mysql4</resourceModel>
+            </fastlycdn>
+            <fastlycdn_resource_mysql4>
+                <class>Fastly_CDN_Model_Resource_Mysql4</class>
+            </fastlycdn_resource_mysql4>
+        </models>
+        <helpers>
+            <fastlycdn>
+                <class>Fastly_CDN_Helper</class>
+            </fastlycdn>
+        </helpers>
+        <blocks>
+            <fastlycdn>
+                <class>Fastly_CDN_Block</class>
+            </fastlycdn>
+            <page>
+                <rewrite>
+                    <html_header>Fastly_CDN_Block_Html_Header</html_header>
+                </rewrite>
+            </page>
+        </blocks>
+        <resources>
+            <fastlycdn_setup>
+                <setup>
+                    <module>Fastly_CDN</module>
+                    <class>Mage_Core_Model_Resource_Setup</class>
+                </setup>
+            </fastlycdn_setup>
+        </resources>
+        <ignoredModules>
+            <entities>
+                <fastlycdn />
+            </entities>
+        </ignoredModules>
+        <events>
+            <!-- purge product cache after stock update -->
+            <cataloginventory_stock_item_save_after>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>purgeCatalogProductByStock</method>
+                    </fastlycdn>
+                </observers>
+            </cataloginventory_stock_item_save_after>
+
+            <!-- register shutdown function to handle core url rewrite raw exit -->
+            <controller_front_init_routers>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>registerShutdownFunction</method>
+                    </fastlycdn>
+                    <fastlycdn_cms>
+                        <class>Fastly_CDN_Controller_Router</class>
+                        <method>initControllerRouters</method>
+                    </fastlycdn_cms>
+                </observers>
+            </controller_front_init_routers>
+        </events>
+
+        <!-- list headers that contain real client IP if webserver is behind Fastly. see app/etc/local.xml -->
+        <remote_addr_headers>
+            <header_fastly>HTTP_FASTLY_CLIENT_IP</header_fastly>
+        </remote_addr_headers>
+    </global>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Fastly_CDN before="Mage_Adminhtml">Fastly_CDN_Adminhtml</Fastly_CDN>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+    <adminhtml>
+        <layout>
+            <updates>
+                <fastlycdn>
+                    <file>fastlycdn.xml</file>
+                </fastlycdn>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Fastly_CDN>
+                    <files>
+                        <default>Fastly_CDN.csv</default>
+                    </files>
+                </Fastly_CDN>
+            </modules>
+        </translate>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <fastlycdn>
+                                            <title>Fastly CDN Settings</title>
+                                        </fastlycdn>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+        <events>
+            <!-- disable page caching for all admin requests -->
+            <controller_action_predispatch_adminhtml>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>disablePageCaching</method>
+                    </fastlycdn>
+                </observers>
+            </controller_action_predispatch_adminhtml>
+
+            <!-- clean CDN page cache together with magento -->
+            <controller_action_postdispatch_adminhtml_cache_flushAll>
+                <observers>
+                    <fastlycdn>
+                        <type>singleton</type>
+                        <class>fastlycdn/observer</class>
+                        <method>cleanCache</method>
+                    </fastlycdn>
+                </observers>
+            </controller_action_postdispatch_adminhtml_cache_flushAll>
+            <controller_action_postdispatch_adminhtml_cache_flushSystem>
+                <observers>
+                    <fastlycdn>
+                        <type>singleton</type>
+                        <class>fastlycdn/observer</class>
+                        <method>cleanCache</method>
+                    </fastlycdn>
+                </observers>
+            </controller_action_postdispatch_adminhtml_cache_flushSystem>
+
+            <!-- clean CDN js/css cache together with magento -->
+            <clean_media_cache_after>
+                <observers>
+                    <enterprise_pagecache>
+                        <class>fastlycdn/observer</class>
+                        <method>cleanMediaCache</method>
+                    </enterprise_pagecache>
+                </observers>
+            </clean_media_cache_after>
+
+            <!-- clean CDN catalog images cache together with magento -->
+            <clean_catalog_images_cache_after>
+                <observers>
+                    <enterprise_pagecache>
+                        <class>fastlycdn/observer</class>
+                        <method>cleanCatalogImagesCache</method>
+                    </enterprise_pagecache>
+                </observers>
+            </clean_catalog_images_cache_after>
+
+            <!-- purge category cache after save -->
+            <catalog_category_save_after>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>purgeCatalogCategory</method>
+                    </fastlycdn>
+                </observers>
+            </catalog_category_save_after>
+
+            <!-- purge product cache after save -->
+            <catalog_product_save_after>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>purgeCatalogProduct</method>
+                    </fastlycdn>
+                </observers>
+            </catalog_product_save_after>
+
+            <!-- purge cms page cache after save -->
+            <cms_page_save_after>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>purgeCmsPage</method>
+                    </fastlycdn>
+                </observers>
+            </cms_page_save_after>
+
+            <!-- show vcl update message -->
+            <core_config_backend_design_exception_save_commit_after>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>showVclUpdateMessage</method>
+                    </fastlycdn>
+                </observers>
+            </core_config_backend_design_exception_save_commit_after>
+        </events>
+    </adminhtml>
+    <frontend>
+        <routers>
+            <fastlycdn>
+                <use>standard</use>
+                <args>
+                    <module>Fastly_CDN</module>
+                    <frontName>fastlycdn</frontName>
+                </args>
+            </fastlycdn>
+        </routers>
+        <layout>
+            <updates>
+                <fastlycdn>
+                    <file>fastlycdn.xml</file>
+                </fastlycdn>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Fastly_CDN>
+                    <files>
+                        <default>Fastly_CDN.csv</default>
+                    </files>
+                </Fastly_CDN>
+            </modules>
+        </translate>
+        <events>
+            <!-- add cache headers -->
+            <controller_action_postdispatch>
+                <observers>
+                    <fastlycdn_setCacheControlHeaders>
+                        <class>fastlycdn/observer</class>
+                        <method>setCacheControlHeaders</method>
+                    </fastlycdn_setCacheControlHeaders>
+                </observers>
+            </controller_action_postdispatch>
+            <!-- set env cookie on currency switch -->
+            <controller_action_postdispatch_directory_currency_switch>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>setEnvironmentCookie</method>
+                    </fastlycdn>
+                </observers>
+            </controller_action_postdispatch_directory_currency_switch>
+            <http_response_send_before>
+                <observers>
+                    <fastlycdn_form_keys>
+                        <class>fastlycdn/observer</class>
+                        <method>replaceFormKeys</method>
+                    </fastlycdn_form_keys>
+                    <fastlycdn_handle_message_cookie>
+                        <class>fastlycdn/observer</class>
+                        <method>handleMessageCookie</method>
+                    </fastlycdn_handle_message_cookie>
+                    <fastlycdn_tag_headers>
+                        <class>fastlycdn/observer</class>
+                        <method>setTagHeaders</method>
+                    </fastlycdn_tag_headers>
+                </observers>
+            </http_response_send_before>
+            <core_session_abstract_add_message>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>disablePageCaching</method>
+                    </fastlycdn>
+                </observers>
+            </core_session_abstract_add_message>
+
+            <!-- stop page caching at visitor interaction -->
+            <checkout_cart_product_add_after>
+                <observers>
+                    <fastlycdn_update_custom_blocks>
+                        <class>fastlycdn/observer</class>
+                        <method>updateCustomBlocks</method>
+                    </fastlycdn_update_custom_blocks>
+                </observers>
+            </checkout_cart_product_add_after>
+            <customer_login>
+                <observers>
+                    <fastlycdn_update_custom_blocks>
+                        <class>fastlycdn/observer</class>
+                        <method>updateCustomBlocks</method>
+                    </fastlycdn_update_custom_blocks>
+                </observers>
+            </customer_login>
+            <catalog_product_compare_add_product>
+                <observers>
+                    <fastlycdn_update_compare_block>
+                        <class>fastlycdn/observer</class>
+                        <method>updateCompareBlock</method>
+                    </fastlycdn_update_compare_block>
+                </observers>
+            </catalog_product_compare_add_product>
+            <wishlist_add_product>
+                <observers>
+                    <fastlycdn_update_wishlist_block>
+                        <class>fastlycdn/observer</class>
+                        <method>updateWishlistBlock</method>
+                    </fastlycdn_update_wishlist_block>
+                </observers>
+            </wishlist_add_product>
+            <controller_action_predispatch>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>registerCookieFormKey</method>
+                    </fastlycdn>
+                </observers>
+            </controller_action_predispatch>
+            <core_block_abstract_to_html_after>
+                <observers>
+                    <fastlycdn_replace_block_by_esi>
+                        <class>fastlycdn/observer</class>
+                        <method>replaceBlockByEsiTag</method>
+                    </fastlycdn_replace_block_by_esi>
+                    <fastlycdn_inspect_blocks>
+                        <class>fastlycdn/observer</class>
+                        <method>inspectBlocks</method>
+                    </fastlycdn_inspect_blocks>
+                </observers>
+            </core_block_abstract_to_html_after>
+            <controller_action_postdispatch_customer_account_logoutSuccess>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>disableCustomBlocks</method>
+                    </fastlycdn>
+                </observers>
+            </controller_action_postdispatch_customer_account_logoutSuccess>
+            <controller_action_predispatch_checkout_cart_delete>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>removeUencReferer</method>
+                    </fastlycdn>
+                </observers>
+            </controller_action_predispatch_checkout_cart_delete>
+            <sales_quote_remove_item>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>updateCustomBlocks</method>
+                    </fastlycdn>
+                </observers>
+            </sales_quote_remove_item>
+            <checkout_cart_update_items_after>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>updateCustomBlocks</method>
+                    </fastlycdn>
+                </observers>
+            </checkout_cart_update_items_after>
+            <catalog_product_compare_remove_product>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>updateCompareBlock</method>
+                    </fastlycdn>
+                </observers>
+            </catalog_product_compare_remove_product>
+            <controller_action_predispatch_catalog_product_compare_remove>
+                <observers>
+                    <fastlycdn_removeUencReferer>
+                        <class>fastlycdn/observer</class>
+                        <method>removeUencReferer</method>
+                    </fastlycdn_removeUencReferer>
+                    <fastlycdn_updateCompareViewedBlock>
+                        <class>fastlycdn/observer</class>
+                        <method>updateCompareViewedBlock</method>
+                    </fastlycdn_updateCompareViewedBlock>
+                </observers>
+            </controller_action_predispatch_catalog_product_compare_remove>
+            <controller_action_predispatch_catalog_product_compare_clear>
+                <observers>
+                    <fastlycdn_removeUencReferer>
+                        <class>fastlycdn/observer</class>
+                        <method>removeUencReferer</method>
+                    </fastlycdn_removeUencReferer>
+                    <fastlycdn_disableCompareBlock>
+                        <class>fastlycdn/observer</class>
+                        <method>disableCompareBlock</method>
+                    </fastlycdn_disableCompareBlock>
+                </observers>
+            </controller_action_predispatch_catalog_product_compare_clear>
+            <controller_action_postdispatch_catalog_product_compare_clear>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>updateCompareViewedBlock</method>
+                    </fastlycdn>
+                </observers>
+            </controller_action_postdispatch_catalog_product_compare_clear>
+            <controller_action_postdispatch_wishlist_index_remove>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>updateWishlistBlock</method>
+                    </fastlycdn>
+                </observers>
+            </controller_action_postdispatch_wishlist_index_remove>
+        </events>
+    </frontend>
+    <fastlycdn_esi_tags>
+        <reports_product_viewed>
+            <block>reports/product_viewed</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_Reports_Product_Viewed</esi_tag>
+            <processor>Fastly_CDN_Model_Esi_Processor_Reports_Product_Viewed</processor>
+        </reports_product_viewed>
+        <checkout_cart_minicart>
+            <block>checkout/cart_minicart</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_Checkout_Sidebar_Cart</esi_tag>
+        </checkout_cart_minicart>
+        <checkout_cart_sidebar>
+            <block>checkout/cart_sidebar</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_Checkout_Sidebar_Cart</esi_tag>
+        </checkout_cart_sidebar>
+        <page_template_links>
+            <block>page/template_links</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_Page_Template_Links</esi_tag>
+        </page_template_links>
+        <page_template_welcome>
+            <block>page/template_welcome</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_Page_Template_Welcome</esi_tag>
+            <processor>Fastly_CDN_Model_Esi_Processor_Page_Template_Welcome</processor>
+        </page_template_welcome>
+        <catalog_compare_sidebar>
+            <block>catalog/product_compare_sidebar</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_Catalog_Product_Compare_Sidebar</esi_tag>
+        </catalog_compare_sidebar>
+        <wishlist_sidebar>
+            <block>wishlist/customer_sidebar</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_Wishlist_Customer_Sidebar</esi_tag>
+        </wishlist_sidebar>
+        <reports_product_compared>
+            <block>reports/product_compared</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_Reports_Product_Compared</esi_tag>
+        </reports_product_compared>
+        <page_html_notices>
+            <block>page/html_notices</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_Page_Html_Notices</esi_tag>
+        </page_html_notices>
+        <getcountry>
+            <block>fastlycdn/esi_geoIp_getcountry</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_GeoIp_Getcountry</esi_tag>
+            <processor>Fastly_CDN_Model_Esi_Processor_GeoIp_Getcountry</processor>
+        </getcountry>
+        <getcountryaction>
+            <block>fastlycdn/esi_geoIp_action</block>
+            <esi_tag>Fastly_CDN_Model_Esi_Tag_GeoIp_Action</esi_tag>
+            <processor>Fastly_CDN_Model_Esi_Processor_GeoIp_Action</processor>
+        </getcountryaction>
+    </fastlycdn_esi_tags>
+    <default>
+        <fastlycdn>
+            <general>
+                <enabled>0</enabled>
+                <disable_caching>0</disable_caching>
+                <disable_routes><![CDATA[checkout
+customer
+moneybookers
+paypal
+wishlist
+catalog_product_compare
+contact
+sales
+newsletter]]></disable_routes>
+                <disable_caching_vars><![CDATA[___SID,order]]></disable_caching_vars>
+                <ttl>14400</ttl>
+                <routes_ttl>a:3:{s:1:"1";a:2:{s:6:"regexp";s:3:"cms";s:5:"value";s:5:"86400";}s:1:"2";a:2:{s:6:"regexp";s:20:"catalog_product_view";s:5:"value";s:4:"7200";}s:1:"3";a:2:{s:6:"regexp";s:16:"catalog_category";s:5:"value";s:5:"21600";}}</routes_ttl>
+                <purge_catalog_category>0</purge_catalog_category>
+                <purge_catalog_product>0</purge_catalog_product>
+                <purge_cms_page>0</purge_cms_page>
+                <debug>0</debug>
+            </general>
+            <esi>
+                <default_ttl>3600</default_ttl>
+                <blocks_ttl>a:7:{s:18:"_1366629298415_415";a:2:{s:6:"regexp";s:22:"reports_product_viewed";s:5:"value";s:4:"3600";}s:18:"_1366629320852_852";a:2:{s:6:"regexp";s:21:"checkout_cart_sidebar";s:5:"value";s:4:"3600";}s:18:"_1366629327885_885";a:2:{s:6:"regexp";s:19:"page_template_links";s:5:"value";s:4:"3600";}s:18:"_1366629333619_619";a:2:{s:6:"regexp";s:21:"page_template_welcome";s:5:"value";s:4:"3600";}s:18:"_1366629338994_994";a:2:{s:6:"regexp";s:23:"catalog_compare_sidebar";s:5:"value";s:4:"3600";}s:18:"_1366629343772_772";a:2:{s:6:"regexp";s:16:"wishlist_sidebar";s:5:"value";s:4:"3600";}s:18:"_1366629349125_125";a:2:{s:6:"regexp";s:24:"reports_product_compared";s:5:"value";s:4:"3600";}}</blocks_ttl>
+                <strict_rendering_enabled>1</strict_rendering_enabled>
+                <debug>0</debug>
+            </esi>
+        </fastlycdn>
+    </default>
+</config>

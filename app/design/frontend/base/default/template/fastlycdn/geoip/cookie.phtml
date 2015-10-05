@@ -1,0 +1,51 @@
+<?php
+/**
+ * Fastly CDN for Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Fastly CDN for Magento End User License Agreement
+ * that is bundled with this package in the file LICENSE_FASTLY_CDN.txt.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Fastly CDN to newer
+ * versions in the future. If you wish to customize this module for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    Fastly
+ * @package     Fastly_CDN
+ * @copyright   Copyright (c) 2015 Fastly, Inc. (http://www.fastly.com)
+ * @license     BSD, see LICENSE_FASTLY_CDN.txt
+ */
+?>
+<?php
+/**
+ * The ESI GeoIP cookie is flag to remember whether the GeoIP action (show dialog or redirect) has already been
+ * processed by the client. If the cookie is set the expiration date needs to be extended on every page load,
+ * otherwise the GeoIP action will be executed again when the cookie expired.
+ * The geoIpActionCookie variable is used in other GeoIP templates.
+ */
+?>
+<?php
+    $_helper = Mage::helper('fastlycdn');
+    /* @var $_helper Fastly_CDN_Helper_Data */
+?>
+<?php if ($_helper->isGeoIpEnabled()): ?>
+    <?php $cookieName = $_helper->getGeoIpCookieName(); ?>
+    <script type="text/javascript">
+        //<![CDATA[
+        var geoIpActionCookie = "<?php echo $cookieName; ?>=1"
+            + "; expires=" + new Date(new Date().getTime() + <?php echo Mage::getModel('core/cookie')->getLifetime() ?> * 1000).toGMTString()
+            + "; path=" + Mage.Cookies.path
+            + "; domain=" + Mage.Cookies.domain;
+        var geoIpActionProcessed = false;
+        if (document.cookie.length && document.cookie.indexOf('<?php echo $cookieName; ?>=') !== -1) {
+            geoIpActionProcessed = true;
+            document.cookie = geoIpActionCookie;
+        }
+        //]]>
+    </script>
+
+    <?php echo $this->getChildHtml('fastlycdn.geoip_getcountry'); ?>
+<?php endif; ?>

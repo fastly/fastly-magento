@@ -1,0 +1,312 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Fastly CDN for Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Fastly CDN for Magento End User License Agreement
+ * that is bundled with this package in the file LICENSE_FASTLY_CDN.txt.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Fastly CDN to newer
+ * versions in the future. If you wish to customize this module for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    Fastly
+ * @package     Fastly_CDN
+ * @copyright   Copyright (c) 2015 Fastly, Inc. (http://www.fastly.com)
+ * @license     BSD, see LICENSE_FASTLY_CDN.txt
+ */
+-->
+<config>
+    <sections>
+        <fastlycdn translate="label" module="fastlycdn">
+            <label>Fastly CDN</label>
+            <tab>service</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>900</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <versioninfo>
+                    <frontend_model>fastlycdn/adminhtml_system_config_fieldset_versioninfo</frontend_model>
+                    <sort_order>0</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                </versioninfo>
+                <general translate="label comment" module="fastlycdn">
+                    <label>General Settings</label>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <sort_order>10</sort_order>
+                    <fields>
+                        <enabled translate="label comment">
+                            <label>Enable cache module</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+                        <service_id translate="label comment">
+                            <label>Fastly Service ID</label>
+                            <comment>Your Service ID appears as an alphanumeric string immediately below the name of your service on the fastly configure tab.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <validate>required-entry</validate>
+                            <depends><enabled>1</enabled></depends>
+                        </service_id>
+                        <api_key translate="label comment">
+                            <label>Fastly API key</label>
+                            <comment>Your API Key is located on the account tab to the left of the Account Settings area.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <validate>required-entry</validate>
+                            <depends><enabled>1</enabled></depends>
+                        </api_key>
+                        <disable_caching translate="label comment">
+                            <label>Disable caching</label>
+                            <comment>Sets cache control to "private"</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </disable_caching>
+                        <disable_routes translate="label comment">
+                            <label>Disable caching for routes</label>
+                            <comment>Set cache control to "private" for certain routes/actions (e.g. checkout, catalog_product_view). Use one per line.</comment>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </disable_routes>
+                        <ttl translate="label comment">
+                            <label>Default cache TTL</label>
+                            <comment>TTL for cached pages in seconds (e.g. "1800" = page cache is valid for 30 minutes).</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </ttl>
+                        <stale_ttl translate="label comment">
+                            <label>Stale content delivery time</label>
+                            <comment>Time in seconds for that stale content will be served. Set to 0 to disable this feature.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </stale_ttl>
+                        <stale_error_ttl translate="label comment">
+                            <label>Stale content delivery time in case of backend error</label>
+                            <comment>Time in seconds for that stale content will be served. Set to 0 to disable this feature.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </stale_error_ttl>
+                        <routes_ttl translate="label comment">
+                            <label>Cache TTL for routes</label>
+                            <comment>TTL for cached pages in seconds for certain routes/actions (e.g. Route:"catalog_product_view", TTL:"7200").</comment>
+                            <frontend_type>textarea</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_routeTTL</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </routes_ttl>
+                        <purge_catalog_category translate="label comment">
+                            <label>Purge category</label>
+                            <comment>Purge categorie's cache item on save</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </purge_catalog_category>
+                        <purge_catalog_product translate="label comment">
+                            <label>Purge product</label>
+                            <comment>Purge product's cache item on save</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </purge_catalog_product>
+                        <purge_cms_page translate="label comment">
+                            <label>Purge CMS page</label>
+                            <comment>Purge CMS page's cache item on save</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </purge_cms_page>
+                        <soft_purge translate="label comment">
+                            <label>Use Soft Purge</label>
+                            <comment>Use Soft Purge in conjunction with stale content delivery times, to serve stale content.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </soft_purge>
+                        <debug translate="label comment">
+                            <label>Debug</label>
+                            <comment>Pass X-headers for debugging purpose to the client and log purge requests to /var/log/fastlycdn_cdn.log (ensure developer log is enabled).</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </debug>
+                    </fields>
+                </general>
+                <esi translate="label comment" module="fastlycdn">
+                    <label>ESI Settings</label>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <sort_order>20</sort_order>
+                    <fields>
+                        <default_ttl translate="label comment">
+                            <label>Default ESI TTL</label>
+                            <comment>TTL for ESI blocks in seconds (e.g. "1800" = block cache within Fastly CDN is valid for 30 minutes).</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </default_ttl>
+                        <blocks_ttl translate="label comment">
+                            <label>ESI TTL for blocks</label>
+                            <comment>TTL in seconds for certain blocks.</comment>
+                            <frontend_type>textarea</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_esiTTL</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </blocks_ttl>
+                        <strict_rendering_enabled>
+                            <label>ESI Strict Rendering</label>
+                            <comment>When set to "No" block logic gets simplified to get better hit rates. However the content might slightly differ from native Magento block.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </strict_rendering_enabled>
+                        <debug translate="label">
+                            <label>ESI Debug</label>
+                            <comment>Highlights ESI block with red border and echos ESI block URL.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </debug>
+                    </fields>
+                </esi>
+                <geoip translate="label comment" module="fastlycdn">
+                    <label>GeoIP Settings</label>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <sort_order>30</sort_order>
+                    <depends><esi><enabled>1</enabled></esi></depends>
+                    <fields>
+                        <enabled translate="label comment">
+                            <label>Enable GeoIP</label>
+                            <comment>Enable GeoIP for country/language lookup.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+                        <show_dialog translate="label comment">
+                            <label>Show a dialog</label>
+                            <comment>Show a dialog to select target store. Choose Yes to show CMS block content in a modal window. Choose No to redirect.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </show_dialog>
+                        <map_redirect translate="label comment">
+                            <label>Mapping for redirects</label>
+                            <comment>Mapping of countries/stores to redirect to. You can use * as a wildcard.</comment>
+                            <frontend_type>textarea</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_storeMap</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <enabled>1</enabled>
+                                <show_dialog>0</show_dialog>
+                            </depends>
+                        </map_redirect>
+                        <map_cmsblock translate="label comment">
+                            <label>Mapping for static CMS blocks</label>
+                            <comment>Mapping of countries/static CMS blocks to display. You can use * as a wildcard.</comment>
+                            <frontend_type>textarea</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_cmsMap</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <enabled>1</enabled>
+                                <show_dialog>1</show_dialog>
+                            </depends>
+                        </map_cmsblock>
+                    </fields>
+                </geoip>
+            </groups>
+        </fastlycdn>
+    </sections>
+</config>

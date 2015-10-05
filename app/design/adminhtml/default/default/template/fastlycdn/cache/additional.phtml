@@ -1,0 +1,88 @@
+<?php
+/**
+ * Fastly CDN for Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Fastly CDN for Magento End User License Agreement
+ * that is bundled with this package in the file LICENSE_FASTLY_CDN.txt.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Fastly CDN to newer
+ * versions in the future. If you wish to customize this module for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    Fastly
+ * @package     Fastly_CDN
+ * @copyright   Copyright (c) 2015 Fastly, Inc. (http://www.fastly.com)
+ * @license     BSD, see LICENSE_FASTLY_CDN.txt
+ */
+?>
+
+<?php if ($this->canShowButton()): ?>
+<form action="<?php echo $this->getCleanContentTypeUrl() ?>" method="post" id="fastlycdn_clean_content_type_form" enctype="multipart/form-data">
+    <?php echo $this->getBlockHtml('formkey')?>
+    <table class="form-list">
+        <tr>
+            <td class="scope-label">
+                <button type="submit" class="scalable"><span><?php echo Mage::helper('fastlycdn')->__('Clean Fastly CDN by content type') ?></span></button>
+            </td>
+            <td>
+                <select name="content_types" class="required-entry select local-validation" style="width:150px">
+                    <?php foreach ($this->getContentTypeOptions() as $contentType): ?>
+                    <option value="<?php echo $contentType['value'] ?>"><?php echo $this->escapeHtml($contentType['label']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+            <td class="scope-label">
+                <?php echo Mage::helper('fastlycdn')->__('Remove selected cache items in Fastly CDN by content type. This removes the selected content type for all stores.')?>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form action="<?php echo $this->getCleanFastlyCDNUrl() ?>" method="post" id="fastlycdn_clean_form" enctype="multipart/form-data">
+    <?php echo $this->getBlockHtml('formkey')?>
+    <table class="form-list">
+        <tr>
+            <td class="scope-label">
+                <button type="submit" class="scalable"><span><?php echo Mage::helper('fastlycdn')->__('Clean Fastly CDN by store') ?></span></button>
+            </td>
+            <td>
+                <select name="stores" class="required-entry select local-validation" style="width:150px">
+                    <?php foreach ($this->getStoreOptions() as $store): ?>
+                        <option value="<?php echo $store['value'] ?>"><?php echo $this->escapeHtml($store['label'],true) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+            <td class="scope-label">
+                <?php echo Mage::helper('fastlycdn')->__('Remove Magento generated content from selected store in Fastly CDN. This only removes store related information, not images, css or js.')?>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form id="quick_purge_form" action="<?php echo $this->getQuickPurgeUrl() ?>" method="post" id="fastlycdn_clean_form" enctype="multipart/form-data">
+    <?php echo $this->getBlockHtml('formkey')?>
+    <table class="form-list">
+        <tr>
+            <td class="scope-label">
+                <button type="submit" class="scalable"><span><?php echo Mage::helper('fastlycdn')->__('Quick Purge') ?></span></button>
+            </td>
+            <td>
+                <input type="text" name="quick_purge_url" class="input-text required-entry" style="width:250px" />
+            </td>
+            <td class="scope-label">
+                <?php echo Mage::helper('fastlycdn')->__('Purge URL in Fastly CDN.')?>
+            </td>
+        </tr>
+    </table>
+</form>
+
+    <script type="text/javascript">
+//<![CDATA[
+    var quickPurgeForm = new varienForm('quick_purge_form');
+//]]>
+</script>
+<?php endif;?>

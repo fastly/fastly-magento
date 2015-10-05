@@ -1,0 +1,11 @@
+README_FASTLY_CDN.md README_FASTLY_CDN.md
+LICENSE_FASTLY_CDN.txt LICENSE_FASTLY_CDN.txt
+app/code/community/Fastly/CDN/* app/code/community/Fastly/CDN/
+app/design/adminhtml/default/default/layout/fastlycdn.xml app/design/adminhtml/default/default/fastlycdn.xml
+app/design/adminhtml/default/default/template/fastlycdn/* app/design/adminhtml/default/default/template/fastlycdn/
+app/design/frontend/base/default/layout/fastlycdn.xml app/design/frontend/base/default/layout/fastlycdn.xml
+app/design/frontend/base/default/template/fastlycdn/* app/design/frontend/base/default/template/fastlycdn/
+app/etc/fastlycdn.xml app/etc/fastlycdn.xml
+app/etc/modules/Fastly_CDN.xml app/etc/modules/Fastly_CDN.xml
+app/locale/de_DE/Fastly_CDN.csv app/locale/de_DE/Fastly_CDN.csv
+app/locale/en_US/Fastly_CDN.csv app/locale/en_US/Fastly_CDN.csv
