@@ -64,9 +64,9 @@ If necessary clear Magento's cache again.
 Upload the VCL file bundled with the FastlyCDN module to your Fastly service.
 
 
-## Fastly Website
+## Fastly App
 
-Tbd. Ask Fastly support for assistance configuring your Fastly account.
+If you don't already have it, send support@fastly.com a request asking to have the Magento feature configured on your account.
 
 Proceed with the configuration.
 
