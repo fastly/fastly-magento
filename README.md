@@ -66,7 +66,7 @@ Upload the VCL file bundled with the FastlyCDN module to your Fastly service.
 
 ## Fastly App
 
-If you don't already have it, send support@fastly.com a request asking to have the Magento feature configured on your account.
+The Fastly Magento plugin requires the ability to upload custom VCL to your services. If you don't already have it, send support@fastly.com a request asking to have the VCL uploading enabled on your account.
 
 Proceed with the configuration.
 
