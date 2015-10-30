@@ -10,7 +10,7 @@ reliability for Magento stores. The FastlyCDN module consists of two main
 components:
 
 - The Magento module and
-- the bundled Varnish Cache configuration file (VCL).
+- [the bundled Varnish Cache configuration file](https://github.com/fastly/fastly-magento/blob/master/app/code/community/Fastly/CDN/etc/default.vcl) (VCL).
 
 The FastlyCDN module basically sets the correct Cache-Control headers according to the
 configuration and the visitor session and provides an interface for purginf Fastly's
