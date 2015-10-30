@@ -348,8 +348,14 @@ By default Varnish does not take into account
 User-Agent string of a request when building its cache object. Magento Design
 Exceptions use regular expressions to match different design configurations to
 User-Agent strings. In order to make Design Exceptions work with Varnish you
-will have to renew Varnish VCL each time Design Exceptions are updated. Here's
-what you have to do: tbd
+will have to renew Varnish VCL each time Design Exceptions are updated. 
+
+The most straightforward way to do this is to execute a [Purge All](https://github.com/fastly/fastly-magento#purge-all) in the 
+Fastly App service config page after you update your Design Exceptions. But,
+due to the configurability of Varnish, [inbound normalization of User-Agent
+strings is possible as an advanced configuration.](https://docs.fastly.com/guides/vcl/delivering-different-content-to-different-devices) 
+This functionality can allow you to more-selectively control the CDN caching 
+rules responsively as you update your Design Exceptions
 
 
 # 6. Troubleshooting
