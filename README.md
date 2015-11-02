@@ -13,7 +13,7 @@ components:
 - [the bundled Varnish Cache configuration file](https://github.com/fastly/fastly-magento/blob/master/app/code/community/Fastly/CDN/etc/default.vcl) (VCL).
 
 The FastlyCDN module basically sets the correct Cache-Control headers according to the
-configuration and the visitor session and provides an interface for purginf Fastly's
+configuration and the visitor session and provides an interface for purging Fastly's
 cache.
 
 The second component, the VCL, configures Varnish to process the client requests and
