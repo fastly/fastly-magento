@@ -26,18 +26,18 @@ to every response.
 Before installing the FastlyCDN module you should setup a
 test environment as you will need to put Fastly in front which will certainly
 take a while for configuring and testing. If you directly rollout this solution
-to your production server you might expirience issues that could affect your
+to your production server you might experience issues that could affect your
 normal eBusiness.
 
 Ensure that your Magento Commerce shop is running without any
-problems in your environment as debugging Magento issues with a Fastly in front
+problems in your environment as debugging Magento issues with Fastly in front
 might be difficult.
 
 FastlyCDN supports Magento Community Edition from version
 1.7 and Magento Enterprise Edition from version 1.12 onwards.
 
-You need an account with fastly.com which alows uploading of custom VCL. If you need
-professional service for setup your environment please contact fastly.com.  
+You need an account with [fastly.com](https://www.fastly.com/signup) which allows [uploading of custom VCL](https://docs.fastly.com/guides/vcl/uploading-custom-vcl). If you need
+professional services for setup your environment please contact fastly.com.  
 
 
 # 2. Installation
@@ -73,22 +73,24 @@ Proceed with the configuration.
 
 # 3. Configuration
 
-This section handles the different configuration option
-for the module as well as settings that have to be done on the server side.
+This section handles the different configuration options
+for the module as well as settings that have to be configured on the server.
 
-Important: If you are using Magento Enterprise make sure to deactive the Page
+**Important:** If you are using Magento Enterprise make sure to deactive the Page
 Cache before enabling FastlyCDN module. You can do this in System > Cache
 Management.
 
 
 ## 3.1 General Settings
 
+In the following section the configuration options for the Fastly CDN module are explained.
+Most of them can be changed on the website and store view levels which allows fine grained
+configurations for different store frontends.
+
 In your Magento backend go to System -> Configuration -> "Fastly CDN" in the "Services"
 section and open "General Settings" tab.
 
-In the following section the configuration options for the FastlyCDN module are explained.
-Most of them can be changed on website and store view level which allows fine granulated
-configurations for different store frontends. Note that if you change a value here Fastly
+**Note** that if you change a value here Fastly
 will not reflect it until you purge its HTML objects or the TTL of the cached objects
 expires.
 
@@ -96,8 +98,8 @@ expires.
 This enables the basic functionality like setting HTTP headers and
 allows cache cleaning on the Magento Cache Management page. This option should
 be set to "Yes" globally as soon as you point one of your store domains to the Fastly
-service even if you like to deactivate the caching for certain websites or store views
-(see option below). Otherwise it may result to unexpected caching behavior and cleaning
+service even if you would like to deactivate the caching for certain websites or store views
+(see option below). Until this is done caching behavior may not work as expected and cleaning
 options on the Cache Magement page won't be available.
 
 ### Fastly Service ID
@@ -106,22 +108,23 @@ Enter the service id of the Fastly service that is connected to the current scop
 ### Fastly API key
 Enter your Fastly API key.
 
+(Details of how to find these are documented (here)[https://docs.fastly.com/guides/account-management-and-security/finding-and-managing-your-account-info])
+
 ### Disable caching
 This option allows you to deactivate caching of every Magento frontend page in Fastly.
-This is useful for development or tests by passing all requests through Fastly without
+This is useful for development or tests and is achieved by passing all requests through Fastly without
 caching them. If you have a staging website within your Magento Enterprise instance make sure this option is set to
-"Yes" for this website. Technically Fastly will still be active but every
-request gets a cache control of "private".
+"Yes" for this website. Requests will still pass through Fastly but every request gets a cache control of "private" to prevent caching.
 
 ### Disable caching for routes
-Certain controllers or actions within Magento must not be cached by Fastly as their
-response surely contains custom data or it is necessary to process a request in
-database (API calls, payment callbacks). Although Fastly passes all POST
+Certain controllers or actions within Magento must not be cached by Fastly as the
+response will contain user specific data or requests may trigger updates in the database
+database such asAPI calls, or payment callbacks. Although Fastly passes all POST
 requests (which most often are used to submit forms with custom information
-etc.) you can define the controllers and actions that should have the "no-cache"
+etc.) you can define the controllers and actions that should have the "private"
 flag in their HTTP response header.
 
-Note: The function relies on  Mage_Core_Controller_Varien_Action::getFullActionName().
+**Note:** The function relies on  Mage_Core_Controller_Varien_Action::getFullActionName().
 
 ### Default cache TTL
 Fastly delivers cached objects without requesting the web server or Magento
@@ -272,7 +275,7 @@ mappings for the countries you want to redirect/inform.
 All country mappings use ISO 3166-1-alpha-2 codes.
 
 #### Mapping for static CMS blocks
-For every country you want to show a dialog you have to enter a country code an
+For every country you want to show a dialog you have to enter a country code and
 select a static CMS block to display. This module comes with predefined CMS
 blocks to be a base for your custom development. The modal window itself can be
 customized by editing the template file at app/design/frontend/base/default/template/
@@ -360,7 +363,7 @@ rules responsively as you update your Design Exceptions
 
 # 6. Troubleshooting
 
-This section handles know issues with the module as well as best practices when using
+This section handles known issues with the module as well as best practices when using
 FastlyCDN.
 
 ## 6.1 Known issues
@@ -371,26 +374,27 @@ FastlyCDN.
 - "Redirect to CMS-page if Cookies are Disabled" in System Configuration->Web-> Browser
   Capabilities Detection must be turned off as visitors served by Fastly won't get a
   cookie until they put something in the cart of login.
-- Logging and statistics will be fragmentary (Fastly won't pass cached requests to the
-  webserver or Magento). Instead make use of a JavaScript based statistics like Google
-  Analytics or use Fastly's metrics.
+- Logging and statistics within Magento will be fragmentary (Fastly won't pass cached requests to the
+  webserver or Magento). Fastly provides streamed (access logs)[https://docs.fastly.com/guides/streaming-logs/setting-up-remote-log-streaming] which can be used in place. 
+  Instead make use of a JavaScript based statistics like Google Analytics or use Fastly's metrics.
 - Running FPC (Magento Enterprise Full Page Cache) along with ESI will result in ESI not
   displaying any cached blocks. To use FastlyCDN with Magento Enterprise you have to
   disable FPC completely.
 
 ## 6.2 Prevent caching for custom modules
 
-In your Magento installation you will surely have custom
-modules whose HTML output shouldn't be cached. Therefore you have to add their
+When using custom modules in your Magento installation whose HTML output shouldn't be cached. Ensure that you add their
 controllers to the "Disable caching for routes" configuration to prevent caching
 of their output.
 
 ## 6.3 Prevent caching for HTML/PHP files outside Magento
 
-Fastly as a CDN respects caching information from the backend server like
-"Cache-Control: max-age=600" or "Expires: Thu, 19 Nov 2021 08:52:00 GMT".
-FastlyCDN uses "Expires" to tell Fastly whether a Magento page is cacheable and
-how long.
+When using a web server such as Apache for assets and pages outside of Magento, Fastly will respect
+caching information recevied from the backend server like:
+"Cache-Control: max-age=600" or "Expires: Thu, 19 Nov 2021 08:52:00 GMT". This tells Fastly if a 
+request is cacheable and for how long. Ensure that you configure these appropriately for your sites needs.
+
+For example:
 
 If you have mod_expires installed in your Apache and the Magento
 default setting in your .htaccess 'ExpiresDefault "access plus 1 year"' this
@@ -405,7 +409,7 @@ add this line to the mod_expires section of your .htaccess file:
 This will set the expiry time of the object equal to the delivery time which
 will not allow Fastly to cache the object.
 
-Note that if a "Expires" header is already set in the HTTP response header mod_expires
+Note that if an "Expires" header is already set in the HTTP response header mod_expires
 will respect it and pass this header without changes.
 
 ## 6.4 Vary HTTP header for User-Agent
