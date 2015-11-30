@@ -267,8 +267,9 @@ redirected to the matching store.
 When set to "yes" your customers will be presented with a dialog.
 When set to "no" your customers will be redirected.
 The action performed depends on two variables:
-1. the current store
-2. the country of the visitor
+
+  1. the current store
+  2. the country of the visitor
 
 To configure the dialog or the redirect url you have to switch to store scope and add
 mappings for the countries you want to redirect/inform.
@@ -357,7 +358,7 @@ The most straightforward way to do this is to execute a [Purge All](https://gith
 Fastly App service config page after you update your Design Exceptions. But,
 due to the configurability of Varnish, [inbound normalization of User-Agent
 strings is possible as an advanced configuration.](https://docs.fastly.com/guides/vcl/delivering-different-content-to-different-devices) 
-This functionality can allow you to more-selectively control the CDN caching 
+This functionality can allow you to more selectively control the CDN caching 
 rules responsively as you update your Design Exceptions
 
 
@@ -383,7 +384,7 @@ FastlyCDN.
 
 ## 6.2 Prevent caching for custom modules
 
-When using custom modules in your Magento installation whose HTML output shouldn't be cached. Ensure that you add their
+When using custom modules in your Magento installation whose HTML output shouldn't be cached, ensure that you add their
 controllers to the "Disable caching for routes" configuration to prevent caching
 of their output.
 
