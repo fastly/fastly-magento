@@ -382,7 +382,7 @@ FastlyCDN.
 - Running FPC (Magento Enterprise Full Page Cache) along with ESI will result in ESI not
   displaying any cached blocks. To use FastlyCDN with Magento Enterprise you have to
   disable FPC completely.
-- When using ESI ensure that paths containing fragments to be populated as an include that gzip is disabled.ß
+- When using ESI ensure that paths containing fragments to be populated as an include that gzip is disabled.
 
 ## 6.2 Prevent caching for custom modules
 
