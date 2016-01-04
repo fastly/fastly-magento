@@ -255,7 +255,6 @@ sub vcl_fetch {
         }
 
         set beresp.http.X-Surrogate-Key = beresp.http.Surrogate-Key;
-        return (deliver);
     }
 
     return (deliver);

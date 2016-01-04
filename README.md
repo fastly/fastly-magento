@@ -50,11 +50,12 @@ as well as the settings within your fastly.com account.
 
 The installation of the Magento module is pretty easy:
 
-1. Copy the contents of the app directory in the archive to the app directory of your
+1. Download the zip archive of this repository to a temporary location on your server and extract it.
+2. Copy the contents of the app directory in the archive to the app directory of your
    Magento instance.
-2. Go to the Magento backend and open the Cache Management (System -> Cache
+3. Go to the Magento backend and open the Cache Management (System -> Cache
    Management) and refresh the configuration and layout cache.
-3. Due to Magento's permission system, please log out and in again before continuing with
+4. Due to Magento's permission system, please log out and in again before continuing with
    the next step.
    
 If any critical issue occurs you can't easily solve, go to app/etc/modules, open
@@ -267,8 +268,9 @@ redirected to the matching store.
 When set to "yes" your customers will be presented with a dialog.
 When set to "no" your customers will be redirected.
 The action performed depends on two variables:
-1. the current store
-2. the country of the visitor
+
+  1. the current store
+  2. the country of the visitor
 
 To configure the dialog or the redirect url you have to switch to store scope and add
 mappings for the countries you want to redirect/inform.
@@ -306,7 +308,7 @@ Fastly caches objects for a certain period of time according to their TTL. After
 object will not be requested from the web server or Magento again. Until the TTL expires
 Fastly will deliver the cached object no matter what will change within Magento or the
 webserver's file system. To force Fastly to cleanup its' cache and to retrieve the
-information again from the backend you can trigger a purge requests right from Magento.
+information again from the backend you can trigger a purge request right from Magento.
 
 In the Magento backend go to System -> Cache Management. If you have enabled the
 FastlyCDN module in the configuration you will see a new button "Clean Fastly
@@ -357,7 +359,7 @@ The most straightforward way to do this is to execute a [Purge All](https://gith
 Fastly App service config page after you update your Design Exceptions. But,
 due to the configurability of Varnish, [inbound normalization of User-Agent
 strings is possible as an advanced configuration.](https://docs.fastly.com/guides/vcl/delivering-different-content-to-different-devices) 
-This functionality can allow you to more-selectively control the CDN caching 
+This functionality can allow you to more selectively control the CDN caching 
 rules responsively as you update your Design Exceptions
 
 
@@ -380,10 +382,11 @@ FastlyCDN.
 - Running FPC (Magento Enterprise Full Page Cache) along with ESI will result in ESI not
   displaying any cached blocks. To use FastlyCDN with Magento Enterprise you have to
   disable FPC completely.
+- When using ESI ensure that paths containing fragments to be populated as an include that gzip is disabled.
 
 ## 6.2 Prevent caching for custom modules
 
-When using custom modules in your Magento installation whose HTML output shouldn't be cached. Ensure that you add their
+When using custom modules in your Magento installation whose HTML output shouldn't be cached, ensure that you add their
 controllers to the "Disable caching for routes" configuration to prevent caching
 of their output.
 
