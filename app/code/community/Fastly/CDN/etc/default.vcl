@@ -72,8 +72,8 @@ sub vcl_recv {
     # formkey lookup
     if (req.url ~ "/fastlycdn/getformkey/") {
         # check if we have a formkey cookie
-        if (req.http.Cookie ~ "FASTLY_CDN_FORMKEY") {
-            set req.http.Formkey = regsub(req.http.cookie, ".*FASTLY_CDN_FORMKEY=([^;]*)(;*.*)?", "\1");
+        if (req.http.Cookie:FASTLY_CDN_FORMKEY) {
+            set req.http.Formkey = req.http.Cookie:FASTLY_CDN_FORMKEY;
         } else {
             # create formkey
             set req.http.seed = req.http.Cookie client.ip remote.port geoip.longitude geoip.latitude geoip.postal_code;
@@ -85,7 +85,7 @@ sub vcl_recv {
     # geoip lookup
     if (req.url ~ "fastlycdn/esi/getcountry/") {
         # check if GeoIP has been already processed by client
-        if (req.http.Cookie ~ "FASTLY_CDN_GEOIP_PROCESSED") {
+        if (req.http.Cookie:FASTLY_CDN_GEOIP_PROCESSED) {
             error 200 "";
         } else {
             # modify req.url and restart request processing
@@ -154,14 +154,8 @@ sub vcl_hash {
     set req.hash += req.http.host;
     set req.hash += req.url;
 
-    if (req.http.cookie ~ "FASTLY_CDN_ENV=") {
-        set req.http.fastlyCDNEnv = regsub(
-            req.http.cookie,
-            "(.*)FASTLY_CDN_ENV=([^;]*)(.*)",
-            "\2"
-        );
-        set req.hash += req.http.fastlyCDNEnv;
-        unset req.http.fastlyCDNEnv;
+    if (req.http.cookie:FASTLY_CDN_ENV) {
+        set req.hash += req.http.cookie:FASTLY_CDN_ENV;
     }
 
     set req.hash += "#####GENERATION#####";
@@ -182,6 +176,9 @@ sub vcl_hit {
 }
 
 sub vcl_miss {
+    # Deactivate gzip on origin
+    unset bereq.http.Accept-Encoding;
+
 #FASTLY miss
 
     return(fetch);
@@ -208,6 +205,21 @@ sub vcl_fetch {
     if (beresp.http.Content-Type ~ "text/html" || beresp.http.Content-Type ~ "text/xml") {
         # enable ESI feature for Magento response by default
         esi;
+    } else {
+        # enable gzip for all static content
+        if ((beresp.status == 200 || beresp.status == 404) && (beresp.http.content-type ~ "^(application\/x\-javascript|text\/css|application\/javascript|text\/javascript|application\/json|application\/vnd\.ms\-fontobject|application\/x\-font\-opentype|application\/x\-font\-truetype|application\/x\-font\-ttf|application\/xml|font\/eot|font\/opentype|font\/otf|image\/svg\+xml|image\/vnd\.microsoft\.icon|text\/plain)\s*($|;)" || req.url ~ "\.(css|js|html|eot|ico|otf|ttf|json)($|\?)" ) ) {
+            # always set vary to make sure uncompressed versions dont always win
+            if (!beresp.http.Vary ~ "Accept-Encoding") {
+                if (beresp.http.Vary) {
+                    set beresp.http.Vary = beresp.http.Vary ", Accept-Encoding";
+                } else {
+                    set beresp.http.Vary = "Accept-Encoding";
+                }
+            }
+            if (req.http.Accept-Encoding == "gzip") {
+                set beresp.gzip = true;
+            }
+        }
     }
 
     if (beresp.http.Cache-Control ~ "private") {
