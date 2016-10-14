@@ -72,8 +72,8 @@ sub vcl_recv {
     # formkey lookup
     if (req.url ~ "/fastlycdn/getformkey/") {
         # check if we have a formkey cookie
-        if (req.http.Cookie ~ "FASTLY_CDN_FORMKEY") {
-            set req.http.Formkey = regsub(req.http.cookie, ".*FASTLY_CDN_FORMKEY=([^;]*)(;*.*)?", "\1");
+        if (req.http.Cookie:FASTLY_CDN_FORMKEY) {
+            set req.http.Formkey = req.http.Cookie:FASTLY_CDN_FORMKEY;
         } else {
             # create formkey
             set req.http.seed = req.http.Cookie client.ip remote.port geoip.longitude geoip.latitude geoip.postal_code;
@@ -85,7 +85,7 @@ sub vcl_recv {
     # geoip lookup
     if (req.url ~ "fastlycdn/esi/getcountry/") {
         # check if GeoIP has been already processed by client
-        if (req.http.Cookie ~ "FASTLY_CDN_GEOIP_PROCESSED") {
+        if (req.http.Cookie:FASTLY_CDN_GEOIP_PROCESSED) {
             error 200 "";
         } else {
             # modify req.url and restart request processing
@@ -154,14 +154,8 @@ sub vcl_hash {
     set req.hash += req.http.host;
     set req.hash += req.url;
 
-    if (req.http.cookie ~ "FASTLY_CDN_ENV=") {
-        set req.http.fastlyCDNEnv = regsub(
-            req.http.cookie,
-            "(.*)FASTLY_CDN_ENV=([^;]*)(.*)",
-            "\2"
-        );
-        set req.hash += req.http.fastlyCDNEnv;
-        unset req.http.fastlyCDNEnv;
+    if (req.http.cookie:FASTLY_CDN_ENV) {
+        set req.hash += req.http.cookie:FASTLY_CDN_ENV;
     }
 
     set req.hash += "#####GENERATION#####";
