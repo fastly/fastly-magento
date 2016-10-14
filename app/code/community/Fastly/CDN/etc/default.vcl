@@ -182,6 +182,9 @@ sub vcl_hit {
 }
 
 sub vcl_miss {
+    # Deactivate gzip on origin
+    unset bereq.http.Accept-Encoding;
+
 #FASTLY miss
 
     return(fetch);
@@ -208,6 +211,21 @@ sub vcl_fetch {
     if (beresp.http.Content-Type ~ "text/html" || beresp.http.Content-Type ~ "text/xml") {
         # enable ESI feature for Magento response by default
         esi;
+    } else {
+        # enable gzip for all static content
+        if ((beresp.status == 200 || beresp.status == 404) && (beresp.http.content-type ~ "^(application\/x\-javascript|text\/css|application\/javascript|text\/javascript|application\/json|application\/vnd\.ms\-fontobject|application\/x\-font\-opentype|application\/x\-font\-truetype|application\/x\-font\-ttf|application\/xml|font\/eot|font\/opentype|font\/otf|image\/svg\+xml|image\/vnd\.microsoft\.icon|text\/plain)\s*($|;)" || req.url ~ "\.(css|js|html|eot|ico|otf|ttf|json)($|\?)" ) ) {
+            # always set vary to make sure uncompressed versions dont always win
+            if (!beresp.http.Vary ~ "Accept-Encoding") {
+                if (beresp.http.Vary) {
+                    set beresp.http.Vary = beresp.http.Vary ", Accept-Encoding";
+                } else {
+                    set beresp.http.Vary = "Accept-Encoding";
+                }
+            }
+            if (req.http.Accept-Encoding == "gzip") {
+                set beresp.gzip = true;
+            }
+        }
     }
 
     if (beresp.http.Cache-Control ~ "private") {
