@@ -158,7 +158,7 @@ sub vcl_hash {
         set req.hash += req.http.cookie:FASTLY_CDN_ENV;
     }
 
-    set req.hash += "#####GENERATION#####";
+    #FASTLY hash
 
     if (!(req.url ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico)$")) {
         call design_exception;
