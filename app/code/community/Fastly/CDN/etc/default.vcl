@@ -21,6 +21,20 @@ sub vcl_recv {
         return (pass);
     }
 
+    # Sort the query arguments
+    set req.url = boltsort.sort(req.url);
+
+    # bypass language switcher
+    if (req.url ~ "(?i)___from_store=.*&___store=.*") {
+        set req.http.X-Pass = "1";
+        return(pass);
+    }
+
+    # set HTTPS header for offloaded TLS
+    if (req.http.Fastly-SSL) {
+        set req.http.Https = "on";
+    }
+
     # auth for purging
     if (req.request == "FASTLYPURGE") {
         # extract token signature and expiration
@@ -51,11 +65,6 @@ sub vcl_recv {
         unset req.http.X-Purge-Token;
         unset req.http.X-Sig;
         unset req.http.X-Exp;
-    }
-
-    # set HTTPS header for offloaded TLS
-    if (req.http.Fastly-SSL) {
-        set req.http.Https = "on";
     }
 
     # disable ESI processing on Origin Shield
@@ -158,11 +167,13 @@ sub vcl_hash {
         set req.hash += req.http.cookie:FASTLY_CDN_ENV;
     }
 
-    set req.hash += "#####GENERATION#####";
-
     if (!(req.url ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico)$")) {
         call design_exception;
     }
+
+# Please do not remove below. It's required for purge all functionality
+#FASTLY hash
+
     return (hash);
 }
 
@@ -205,6 +216,9 @@ sub vcl_fetch {
     if (beresp.http.Content-Type ~ "text/html" || beresp.http.Content-Type ~ "text/xml") {
         # enable ESI feature for Magento response by default
         esi;
+        # Since varnish doesn't compress ESIs we need to hint to the HTTP/2 terminators to
+        # compress it
+        set beresp.http.x-compress-hint = "on";
     } else {
         # enable gzip for all static content
         if ((beresp.status == 200 || beresp.status == 404) && (beresp.http.content-type ~ "^(application\/x\-javascript|text\/css|application\/javascript|text\/javascript|application\/json|application\/vnd\.ms\-fontobject|application\/x\-font\-opentype|application\/x\-font\-truetype|application\/x\-font\-ttf|application\/xml|font\/eot|font\/opentype|font\/otf|image\/svg\+xml|image\/vnd\.microsoft\.icon|text\/plain)\s*($|;)" || req.url ~ "\.(css|js|html|eot|ico|otf|ttf|json)($|\?)" ) ) {
@@ -234,7 +248,7 @@ sub vcl_fetch {
         return (deliver);
     }
 
-    if (beresp.status == 200 || beresp.status == 301 || beresp.status == 404) {
+    if (http_status_matches(beresp.status, "200,301,404") && !req.http.X-Pass) {
         if (beresp.http.Content-Type ~ "text/html" || beresp.http.Content-Type ~ "text/xml") {
             # marker for vcl_deliver to reset Age:
             set beresp.http.magentomarker = "1";
