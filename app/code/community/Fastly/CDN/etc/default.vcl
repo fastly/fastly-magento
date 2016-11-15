@@ -35,6 +35,12 @@ sub vcl_recv {
         set req.http.Https = "on";
     }
 
+    if (req.http.cookie:FASTLY_CDN_ENV) {
+        set req.http.Fastly-Cdn-Env = req.http.cookie:FASTLY_CDN_ENV;
+    } else {
+        unset req.http.Fastly-Cdn-Env;
+    }
+
     # auth for purging
     if (req.request == "FASTLYPURGE") {
         # extract token signature and expiration
@@ -159,13 +165,8 @@ sub vcl_pass {
 }
 
 sub vcl_hash {
-    set req.hash += req.http.Https;
     set req.hash += req.http.host;
     set req.hash += req.url;
-
-    if (req.http.cookie:FASTLY_CDN_ENV) {
-        set req.hash += req.http.cookie:FASTLY_CDN_ENV;
-    }
 
     if (!(req.url ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico)$")) {
         call design_exception;
@@ -216,6 +217,13 @@ sub vcl_fetch {
     if (beresp.http.Content-Type ~ "text/html" || beresp.http.Content-Type ~ "text/xml") {
         # enable ESI feature for Magento response by default
         esi;
+        if (!beresp.http.Vary ~ "Fastly-Cdn-Env,Https") {
+            if (beresp.http.Vary) {
+                    set beresp.http.Vary = beresp.http.Vary ",Fastly-Cdn-Env,Https";
+                } else {
+                    set beresp.http.Vary = "Fastly-Cdn-Env,Https";
+                }
+        }
         # Since varnish doesn't compress ESIs we need to hint to the HTTP/2 terminators to
         # compress it
         set beresp.http.x-compress-hint = "on";
@@ -304,6 +312,11 @@ sub vcl_deliver {
         remove resp.http.X-Purge-URL;
         remove resp.http.X-Purge-Host;
         remove resp.http.X-Surrogate-Key;
+    }
+
+    # Clean up Vary before handing off to the user
+    if ( !req.http.Fastly-FF ) {
+        set resp.http.Vary = regsub(resp.http.Vary, "Fastly-Cdn-Env,Https", "Cookie");
     }
 
     if (resp.http.magentomarker) {
