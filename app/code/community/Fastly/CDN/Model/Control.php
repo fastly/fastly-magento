@@ -107,6 +107,14 @@ class Fastly_CDN_Model_Control
         return true;
     }
 
+    public function testConnection($serviceId, $apiKey)
+    {
+        $uri = self::FASTLY_API_ENDPOINT . 'service/' . $serviceId;
+        $result = $this->_fetch($uri, 'GET', true, $apiKey);
+
+        return $result;
+    }
+
     /**
      * Returns the fastly api service uri
      *
@@ -162,6 +170,49 @@ class Fastly_CDN_Model_Control
             }
         } catch (Exception $e) {
             Mage::helper('fastlycdn')->debug('Purging failed (' . $e->getMessage() . ').');
+        }
+    }
+
+    /**
+     * Fetch fastly
+     *
+     * @param $uri
+     * @param string $verb
+     * @param bool $test
+     * @param null $testApiKey
+     */
+    protected function _fetch($uri, $verb = 'GET', $test = false, $testApiKey = null)
+    {
+        // set headers
+
+        if($test) {
+            $apiKey = $testApiKey;
+        } else {
+            $apiKey = Mage::helper('fastlycdn')->getApiKey();
+        }
+
+        $headers = array(
+            self::FASTLY_HEADER_AUTH  => $apiKey,
+        );
+
+        try {
+            // create HTTP client
+            $client = new Zend_Http_Client();
+            $client->setUri($uri)
+                ->setHeaders($headers);
+
+            // send request
+            $response = $client->request($verb);
+
+            // check response
+            if ($response->getStatus() != '200') {
+                throw new Exception('Return status ' . $response->getStatus());
+            }
+
+            return $response;
+        } catch (Exception $e) {
+            Mage::helper('fastlycdn')->debug('Purging failed (' . $e->getMessage() . ').');
+            return false;
         }
     }
 }

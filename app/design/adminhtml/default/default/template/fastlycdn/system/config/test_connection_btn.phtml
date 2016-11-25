@@ -1,0 +1,50 @@
+<script type="text/javascript">
+    //<![CDATA[
+    function check() {
+        var key = $('fastlycdn_general_api_key').getValue();
+        var serviceId = $('fastlycdn_general_service_id').getValue();
+
+        new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+            method:     'post',
+            parameters: {api_key: key, service_id: serviceId},
+            onCreate: function () {
+                $('fastly-test-error').hide();
+                $('fastly-test-success').hide();
+            },
+            onSuccess: function(transport){
+                var response = transport.responseJSON;
+
+                if(response.status == false)
+                {
+                    $('fastly-test-error').show();
+                } else {
+                    $('fastly-test-success').show();
+                }
+            }
+        });
+    }
+    //]]>
+</script>
+
+<?php echo $this->getButtonHtml() ?>
+
+<ul class="messages" id="fastly-test-success" style="display: none;">
+    <li class="success-msg">
+        <ul>
+            <li>
+                <span><?php echo Mage::helper('fastlycdn')->__('Connection is succesfully established. Please, save configuration and clear cache.'); ?></span>
+
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<ul class="messages" id="fastly-test-error" style="display: none;">
+    <li class="error-msg">
+        <ul>
+            <li>
+                <span><?php echo Mage::helper('fastlycdn')->__('Please check your Service ID and API key and try again.'); ?></span>
+            </li>
+        </ul>
+    </li>
+</ul>

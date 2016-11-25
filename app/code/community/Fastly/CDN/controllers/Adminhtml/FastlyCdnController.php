@@ -157,4 +157,23 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
         }
         $this->_redirect('*/cache/index');
     }
+
+    public function testConnectionAction()
+    {
+        $apiKey = $this->getRequest()->getParam('api_key');
+        $serviceId = $this->getRequest()->getParam('service_id');
+
+        $result = Mage::getModel('fastlycdn/control')->testConnection($serviceId, $apiKey);
+
+        $this->getResponse()->setHeader('Content-type', 'application/json');
+
+        $jsonData = Mage::helper('core')->jsonEncode(array('status' => true));
+
+        if(!$result)
+        {
+            $jsonData = Mage::helper('core')->jsonEncode(array('status' => false));
+        }
+
+        return $this->getResponse()->setBody($jsonData);
+    }
 }
