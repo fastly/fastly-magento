@@ -11,6 +11,6 @@
         }
     ],
     "require": {
-        "cotya/composer-magento-plugin ": "dev-master"
+        "magento-hackathon/magento-composer-installer": "*"
     }
 }
