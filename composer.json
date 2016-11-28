@@ -11,6 +11,6 @@
         }
     ],
     "require": {
-        "cotya/composer-magento-plugin ": "*"
+        "cotya/composer-magento-plugin ": "dev-master"
     }
 }
