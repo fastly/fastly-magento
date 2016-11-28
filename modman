@@ -1,5 +1,5 @@
-README_FASTLY_CDN.md README_FASTLY_CDN.md
-LICENSE_FASTLY_CDN.txt LICENSE_FASTLY_CDN.txt
+README.md README.md
+LICENSE.txt LICENSE.txt
 app/code/community/Fastly/CDN/* app/code/community/Fastly/CDN/
 app/design/adminhtml/default/default/layout/fastlycdn.xml app/design/adminhtml/default/default/fastlycdn.xml
 app/design/adminhtml/default/default/template/fastlycdn/* app/design/adminhtml/default/default/template/fastlycdn/
