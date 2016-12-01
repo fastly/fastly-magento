@@ -76,6 +76,8 @@ sub vcl_recv {
     # disable ESI processing on Origin Shield
     if (req.http.Fastly-FF) {
         set req.esi = false;
+        # Needed for proper handling of stale while revalidated when shielding is involved
+        set req.max_stale_while_revalidate = 0s;
     }
 
     # static files are always cacheable. remove SSL flag and cookie
@@ -257,7 +259,7 @@ sub vcl_fetch {
     }
 
     if (http_status_matches(beresp.status, "200,301,404") && !req.http.X-Pass) {
-        if (beresp.http.Content-Type ~ "text/html" || beresp.http.Content-Type ~ "text/xml") {
+        if (beresp.http.Content-Type ~ "text/(html|xml)") {
             # marker for vcl_deliver to reset Age:
             set beresp.http.magentomarker = "1";
 
@@ -288,7 +290,6 @@ sub vcl_fetch {
             set beresp.http.Surrogate-Key = "css";
         }
 
-        set beresp.http.X-Surrogate-Key = beresp.http.Surrogate-Key;
     }
 
     return (deliver);
@@ -319,7 +320,6 @@ sub vcl_deliver {
         remove resp.http.Age;
         remove resp.http.X-Purge-URL;
         remove resp.http.X-Purge-Host;
-        remove resp.http.X-Surrogate-Key;
     }
 
     # Clean up Vary before handing off to the user
