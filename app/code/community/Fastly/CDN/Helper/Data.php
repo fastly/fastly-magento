@@ -36,6 +36,7 @@ class Fastly_CDN_Helper_Data extends Mage_Core_Helper_Abstract
     const PARAM_LAYOUT_HANDLES = 'layout_handles';
     const PARAM_ESI_DATA       = 'esi_data';
     const PARAM_IS_SECURE      = 'is_secure';
+    const PARAM_CURRENT_PRODUCT_ID = 'current_product_id';
 
     const FASTLY_LOG_FILENAME  = 'fastlyCDN.log';
 
@@ -353,6 +354,10 @@ class Fastly_CDN_Helper_Data extends Mage_Core_Helper_Abstract
         return self::PARAM_IS_SECURE;
     }
 
+    public function getCurrentProductIdParam()
+    {
+        return self::PARAM_CURRENT_PRODUCT_ID;
+    }
 
     /**
      * @return string

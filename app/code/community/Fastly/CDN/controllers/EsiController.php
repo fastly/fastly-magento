@@ -78,6 +78,15 @@ class Fastly_CDN_EsiController extends Mage_Core_Controller_Front_Action
             Mage::register('current_category', Mage::getModel('catalog/category'));
             Mage::register('product', Mage::getModel('catalog/product'));
 
+            // if current product id exists, register current product
+            if($currentProductId = $this->getRequest()->getParam($this->_getHelper()->getCurrentProductIdParam())) {
+                $currentProduct = Mage::getModel('catalog/product')
+                                ->setStoreId(Mage::app()->getStore()->getId())
+                                ->load($currentProductId);
+
+                Mage::register('current_product', $currentProduct);
+            }
+
             // add handles
             $update = $this->getLayout()->getUpdate();
             $existingHandles = $update->getHandles();

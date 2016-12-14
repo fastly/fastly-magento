@@ -37,12 +37,21 @@ class Fastly_CDN_Model_Esi_Tag_Abstract extends Mage_Core_Model_Abstract
         $esiTag = '';
 
         if (($esiUrl = $this->_getEsiUrl()) && ($cookieName = $this->_getEsiCookieName())) {
+
+            // check if current product exists in registry and obtain current product id
+            $currentProductId = null;
+
+            if(Mage::registry('current_product')) {
+                $currentProductId = Mage::registry('current_product')->getId();
+            }
+
             // set ESI parameters to determine block properties in URL
             $query = array(
                 $this->_getHelper()->getLayoutNameParam()     => $this->getLayoutName(),
                 $this->_getHelper()->getEsiDataParam()        => $cookieName,
                 $this->_getHelper()->getLayoutHandlesParam()  => $this->_getLayoutHandles($block),
-                $this->_getHelper()->getIsSecureParam()       => Mage::app()->getStore()->isCurrentlySecure() ? '1' : '0'
+                $this->_getHelper()->getIsSecureParam()       => Mage::app()->getStore()->isCurrentlySecure() ? '1' : '0',
+                $this->_getHelper()->getCurrentProductIdParam() => $currentProductId
             );
 
             // add additional (block specific) query params
