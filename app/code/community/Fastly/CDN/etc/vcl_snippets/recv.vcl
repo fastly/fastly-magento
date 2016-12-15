@@ -93,44 +93,10 @@
     }
 
     # check for ESI calls
-     if (req.url ~ "esi_data=") {
-         # check for valid cookie data
-         if (req.http.Cookie ~ "FASTLY_CDN-") {
-             # get the cookie name to look for
-             set req.http.fastlyCDNEsiCookieName = regsub(
-                 req.url,
-                 "(.*)esi_data=([^&]*)(.*)",
-                 "\2"
-             );
-
-             # get the cookie value for the cookie name
-             # tmp string is NAMESPACE-COOKIENAME@@@@@COMPLETE_COOKIE
-             # left of @@@@@ is back-referenced in regex to extract value from cookie
-             set req.http.fastlyTmp = "FASTLY_CDN-" req.http.fastlyCDNEsiCookieName "@@@@@" req.http.Cookie;
-             set req.http.fastlyCDNRequest = regsub(
-                 req.http.fastlyTmp,
-                 "^([A-Za-z0-9-_]+)@@@@@.*\1=([^;]*)",
-                 "\2"
-             );
-
-             # do we have a value for the cookie name?
-             if (!req.http.fastlyCDNRequest) {
-                 set req.http.fastlyCDNRequest = "default";
-             }
-
-             # build backend url
-             set req.url = regsub(
-                   req.url,
-                   "(.*)esi_data=([^&]*)[&]?(.*)",
-                   "\1\3"
-                 )
-                 "&esi_data="
-                 req.http.fastlyCDNRequest;
-
-             # clean up temp variables
-             remove req.http.fastlyCDNEsiCookieName;
-             remove req.http.fastlyCDNRequest;
-
-         }
-     }
+    if (req.url ~ "esi_data=") {
+        # check for valid cookie data
+        if (req.http.Cookie ~ "FASTLY_CDN-([A-Za-z0-9-_]+)=([^;]*)") {
+            set req.url = querystring.filter(req.url, "esi_data") + "&esi_data=" + re.group.2;
+        }
+    }
 
