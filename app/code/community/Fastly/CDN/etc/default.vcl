@@ -163,6 +163,9 @@ sub vcl_recv {
 }
 
 sub vcl_pass {
+    # Deactivate gzip on origin
+    unset bereq.http.Accept-Encoding;
+
 #FASTLY pass
 }
 
