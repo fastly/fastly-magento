@@ -57,13 +57,47 @@ The installation of the Magento module is pretty easy:
    Management) and refresh the configuration and layout cache.
 4. Due to Magento's permission system, please log out and in again before continuing with
    the next step.
-   
+
 If any critical issue occurs you can't easily solve, go to app/etc/modules, open
 "Fastly_CDN.xml" and set "false" in the "active" tag to deactivate the FastlyCDN module.
 If necessary clear Magento's cache again.
 
 Upload the VCL file bundled with the FastlyCDN module to your Fastly service.
 
+### Installation using composer.json
+
+**NOTE:** Magento 1 by default doesn't support composer, as modules are spread out amongst multiple directories. However, we have created a workaround that uses the third party extension [magento-composer-installer](https://github.com/Cotya/magento-composer-installer). This enables composer to install Magento modules using this [modman](https://github.com/fastly/fastly-magento/blob/master/modman) file, which defines the module paths mapping.
+
+Since Magento 1 doesn't ship with a `composer.json` file, you will have to create one manually in the M1 root directory with the following content:
+
+ ​```{
+    "require": {
+        "fastly/cdn": "*"
+    },
+    "repositories": {
+        "fastly-magento": {
+            "type": "git",
+            "url": "https://github.com/fastly/fastly-magento.git​"
+        }
+    },
+    "extra": {
+        "magento-root-dir": "./",
+        "magento-deploystrategy": "copy",
+        "magento-force": true
+    }
+}​```
+
+Once you have added this file you should be able to run `composer update` in order to create the `/vendor` folder with the required dependencies, and then copy the various Fastly module files according to paths from the modman file.
+
+Alternatively, you can create the required `composer.json` by entering the following commands:
+```
+composer init
+composer config repositories.fastly-magento git "https://github.com/fastly/fastly-magento.git"
+composer config extra.magento-root-dir ./
+composer config extra.magento-deploystrategy copy
+composer config extra.magento-force true
+composer require fastly/cdn
+```
 
 ## Fastly App
 
@@ -165,10 +199,10 @@ to "Yes" and category cache will be invalidated each time a category update occu
 
 ### Purge product
 This option binds purge of product (Fastly) cache with product and  product's stock
-update. If set to "Yes" product pages cache is 
+update. If set to "Yes" product pages cache is
 invalidated each time product update or product's stock update occurs.
 
-Additionally, if "Purge Category" option is set to "Yes" this triggers 
+Additionally, if "Purge Category" option is set to "Yes" this triggers
 product's categories cache purge on product/product stock update. This option is
 useful to keep product pages and categories up-to-date when product becomes out
 of stock (i.e. when the last item purchased by a customer).
@@ -229,7 +263,7 @@ value in the next section.
 
 #### ESI TTL for blocks
 You can override the default TTL by setting block specific values. The
-block name must match the tag names defined in the config.xml in 
+block name must match the tag names defined in the config.xml in
 app/code/community/fastly/CDN/etc in the <FastlyCDN_esi_tags> section.
 
 #### ESI Strict Rendering
@@ -353,13 +387,13 @@ By default Varnish does not take into account
 User-Agent string of a request when building its cache object. Magento Design
 Exceptions use regular expressions to match different design configurations to
 User-Agent strings. In order to make Design Exceptions work with Varnish you
-will have to renew Varnish VCL each time Design Exceptions are updated. 
+will have to renew Varnish VCL each time Design Exceptions are updated.
 
-The most straightforward way to do this is to execute a [Purge All](https://github.com/fastly/fastly-magento#purge-all) in the 
+The most straightforward way to do this is to execute a [Purge All](https://github.com/fastly/fastly-magento#purge-all) in the
 Fastly App service config page after you update your Design Exceptions. But,
 due to the configurability of Varnish, [inbound normalization of User-Agent
-strings is possible as an advanced configuration.](https://docs.fastly.com/guides/vcl/delivering-different-content-to-different-devices) 
-This functionality can allow you to more selectively control the CDN caching 
+strings is possible as an advanced configuration.](https://docs.fastly.com/guides/vcl/delivering-different-content-to-different-devices)
+This functionality can allow you to more selectively control the CDN caching
 rules responsively as you update your Design Exceptions
 
 
@@ -377,7 +411,7 @@ FastlyCDN.
   Capabilities Detection must be turned off as visitors served by Fastly won't get a
   cookie until they put something in the cart of login.
 - Logging and statistics within Magento will be fragmentary (Fastly won't pass cached requests to the
-  webserver or Magento). Fastly provides streamed (access logs)[https://docs.fastly.com/guides/streaming-logs/setting-up-remote-log-streaming] which can be used in place. 
+  webserver or Magento). Fastly provides streamed (access logs)[https://docs.fastly.com/guides/streaming-logs/setting-up-remote-log-streaming] which can be used in place.
   Instead make use of a JavaScript based statistics like Google Analytics or use Fastly's metrics.
 - Running FPC (Magento Enterprise Full Page Cache) along with ESI will result in ESI not
   displaying any cached blocks. To use FastlyCDN with Magento Enterprise you have to
@@ -394,7 +428,7 @@ of their output.
 
 When using a web server such as Apache for assets and pages outside of Magento, Fastly will respect
 caching information recevied from the backend server like:
-"Cache-Control: max-age=600" or "Expires: Thu, 19 Nov 2021 08:52:00 GMT". This tells Fastly if a 
+"Cache-Control: max-age=600" or "Expires: Thu, 19 Nov 2021 08:52:00 GMT". This tells Fastly if a
 request is cacheable and for how long. Ensure that you configure these appropriately for your sites needs.
 
 For example:
@@ -428,4 +462,3 @@ cache hits check your backend response and make sure the Vary header only looks
 like this:
 
 	Vary: Accept-Encoding
-
