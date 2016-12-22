@@ -27,7 +27,6 @@ sub vcl_recv {
     # bypass language switcher
     if (req.url ~ "(?i)___from_store=.*&___store=.*") {
         set req.http.X-Pass = "1";
-        return(pass);
     }
 
     # set HTTPS header for offloaded TLS
@@ -43,34 +42,28 @@ sub vcl_recv {
 
     # auth for purging
     if (req.request == "FASTLYPURGE") {
-        # extract token signature and expiration
-        set req.http.X-Sig = regsub(req.http.X-Purge-Token, "^[^_]+_(.*)", "\1");
-        set req.http.X-Exp = regsub(req.http.X-Purge-Token, "^([^_]+)_.*", "\1");
 
-        # validate signature
-        if (req.http.X-Sig == regsub(digest.hmac_sha1(req.service_id, req.url.path req.http.X-Exp), "^0x", "")) {
+        if (!req.http.X-Purge-Token ~ "^([^_]+)_(.*)" ) {
+            error 403;
+        }
 
-            # use vcl time math to check expiration timestamp
-            set req.http.X-Original-Grace = req.grace;
-            set req.grace = std.atoi(strftime({"%s"}, now));
-            set req.grace -= std.atoi(req.http.X-Exp);
+        declare local var.X-Exp STRING;
+        declare local var.X-Sig STRING;
+        /* extract token expiration and signature */
+        set var.X-Exp = re.group.1;
+        set var.X-Sig = re.group.2;
 
-            if (std.atoi(req.grace) > 0) {
+        /* validate signature */
+        if (var.X-Sig == regsub(digest.hmac_sha1(req.service_id, req.url.path var.X-Exp), "^0x", "")) {
+            /* check that expiration time has not elapsed */
+            if (time.is_after(now, std.integer2time(std.atoi(var.X-Exp)))) {
                 error 410;
             }
-
-            # clean up grace since we used it for time math
-            set req.grace = std.atoi(req.http.X-Original-Grace);
-            unset req.http.X-Original-Grace;
 
         } else {
             error 403;
         }
 
-        # cleanup variables
-        unset req.http.X-Purge-Token;
-        unset req.http.X-Sig;
-        unset req.http.X-Exp;
     }
 
     # disable ESI processing on Origin Shield
@@ -123,47 +116,13 @@ sub vcl_recv {
             set req.url = querystring.filter(req.url, "esi_data") + "&esi_data=" + re.group.2;
         }
     }
-
-    return(lookup);
-}
-
-sub vcl_pass {
-    # Deactivate gzip on origin
-    unset bereq.http.Accept-Encoding;
-
-#FASTLY pass
-}
-
-sub vcl_hash {
-    set req.hash += req.http.host;
-    set req.hash += req.url;
-
-    if (!(req.url ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico)$")) {
-        call design_exception;
-    }
-
-# Please do not remove below. It's required for purge all functionality
-#FASTLY hash
-
-    return (hash);
-}
-
-sub vcl_hit {
-#FASTLY hit
-
-    if (!obj.cacheable) {
+    
+    # If object has been marked as pass pass it
+    if ( req.http.X-Pass ) {
         return(pass);
     }
-    return(deliver);
-}
 
-sub vcl_miss {
-    # Deactivate gzip on origin
-    unset bereq.http.Accept-Encoding;
-
-#FASTLY miss
-
-    return(fetch);
+    return(lookup);
 }
 
 sub vcl_fetch {
@@ -184,7 +143,7 @@ sub vcl_fetch {
         set beresp.http.Fastly-Restarts = req.restarts;
     }
 
-    if (beresp.http.Content-Type ~ "text/html" || beresp.http.Content-Type ~ "text/xml") {
+    if (beresp.http.Content-Type ~ "text/(html|xml)") {
         # enable ESI feature for Magento response by default
         esi;
         if (!beresp.http.Vary ~ "Fastly-Cdn-Env,Https") {
@@ -199,7 +158,7 @@ sub vcl_fetch {
         set beresp.http.x-compress-hint = "on";
     } else {
         # enable gzip for all static content
-        if ((beresp.status == 200 || beresp.status == 404) && (beresp.http.content-type ~ "^(application\/x\-javascript|text\/css|application\/javascript|text\/javascript|application\/json|application\/vnd\.ms\-fontobject|application\/x\-font\-opentype|application\/x\-font\-truetype|application\/x\-font\-ttf|application\/xml|font\/eot|font\/opentype|font\/otf|image\/svg\+xml|image\/vnd\.microsoft\.icon|text\/plain)\s*($|;)" || req.url ~ "\.(css|js|html|eot|ico|otf|ttf|json)($|\?)" ) ) {
+        if (http_status_matches(beresp.status, "200,404") && (beresp.http.content-type ~ "^(application\/x\-javascript|text\/css|application\/javascript|text\/javascript|application\/json|application\/vnd\.ms\-fontobject|application\/x\-font\-opentype|application\/x\-font\-truetype|application\/x\-font\-ttf|application\/xml|font\/eot|font\/opentype|font\/otf|image\/svg\+xml|image\/vnd\.microsoft\.icon|text\/plain)\s*($|;)" || req.url.ext ~ "(?i)(css|js|html|eot|ico|otf|ttf|json)" ) ) {
             # always set vary to make sure uncompressed versions dont always win
             if (!beresp.http.Vary ~ "Accept-Encoding") {
                 if (beresp.http.Vary) {
@@ -223,7 +182,8 @@ sub vcl_fetch {
         set req.http.Fastly-Cachetype = "ERROR";
         set beresp.ttl = 1s;
         set beresp.grace = 5s;
-        return (deliver);
+        return (deliver);    set req.hash += req.url;
+
     }
 
     if (http_status_matches(beresp.status, "200,301,404") && !req.http.X-Pass) {
@@ -267,7 +227,7 @@ sub vcl_deliver {
 
     # Add an easy way to see whether custom Fastly VCL has been uploaded
     if ( req.http.Fastly-Debug ) {
-        set resp.http.Fastly-Magento-VCL-Uploaded = "1.0.4";
+        set resp.http.Fastly-Magento-VCL-Uploaded = "1.0.5";
     } else {
         remove resp.http.Fastly-Module-Enabled;
     }
@@ -302,7 +262,6 @@ sub vcl_deliver {
         set resp.http.Cache-Control = "no-store, no-cache, must-revalidate, post-check=0, pre-check=0";
         set resp.http.Pragma        = "no-cache";
         set resp.http.Expires       = "Mon, 31 Mar 2008 10:00:00 GMT";
-        set resp.http.Age           = "0";
     }
 
 #FASTLY deliver
@@ -328,14 +287,14 @@ sub vcl_error {
     # geo ip country code
     if (obj.status == 755) {
         set obj.status = 200;
-	    synthetic obj.response;
+        synthetic obj.response;
         return(deliver);
     }
 
     # formkey request
     if (obj.status == 760) {
         set obj.status = 200;
-	    synthetic obj.response;
+        synthetic obj.response;
         return (deliver);
     }
 
@@ -366,6 +325,46 @@ sub vcl_error {
 
 #FASTLY error
 }
+
+sub vcl_pass {
+    # Deactivate gzip on origin
+    unset bereq.http.Accept-Encoding;
+
+#FASTLY pass
+}
+
+sub vcl_hit {
+#FASTLY hit
+
+    if (!obj.cacheable) {
+        return(pass);
+    }
+    return(deliver);
+}
+
+sub vcl_miss {
+    # Deactivate gzip on origin
+    unset bereq.http.Accept-Encoding;
+
+#FASTLY miss
+
+    return(fetch);
+}
+
+sub vcl_hash {
+    set req.hash += req.http.host;
+    set req.hash += req.url;
+
+    if (!(req.url ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico)$")) {
+        call design_exception;
+    }
+
+# Please do not remove below. It's required for purge all functionality
+#FASTLY hash
+
+    return (hash);
+}
+
 
 sub design_exception {
 }
