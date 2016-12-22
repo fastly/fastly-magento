@@ -69,8 +69,7 @@ Upload the VCL file bundled with the FastlyCDN module to your Fastly service.
 **NOTE:** Magento 1 by default doesn't support composer, as modules are spread out amongst multiple directories. However, we have created a workaround that uses the third party extension [magento-composer-installer](https://github.com/Cotya/magento-composer-installer). This enables composer to install Magento modules using this [modman](https://github.com/fastly/fastly-magento/blob/master/modman) file, which defines the module paths mapping.
 
 Since Magento 1 doesn't ship with a `composer.json` file, you will have to create one manually in the M1 root directory with the following content:
-
- ​```javascript
+ ​```
  {
     "require": {
         "fastly/cdn": "*"
