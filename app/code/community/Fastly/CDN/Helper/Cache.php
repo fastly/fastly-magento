@@ -68,11 +68,6 @@ class Fastly_CDN_Helper_Cache extends Mage_Core_Helper_Abstract
             $this->setDebugHeader();
         }
 
-        // disable caching of secure pages
-        if (Mage::app()->getStore()->isCurrentlySecure()) {
-            return $this->setNoCacheHeader();
-        }
-
         $request = Mage::app()->getRequest();
 
         // check for disable caching vars
