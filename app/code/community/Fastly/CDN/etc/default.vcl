@@ -182,8 +182,7 @@ sub vcl_fetch {
         set req.http.Fastly-Cachetype = "ERROR";
         set beresp.ttl = 1s;
         set beresp.grace = 5s;
-        return (deliver);    set req.hash += req.url;
-
+        return (deliver);
     }
 
     if (http_status_matches(beresp.status, "200,301,404") && !req.http.X-Pass) {
