@@ -52,7 +52,7 @@ class Fastly_CDN_Helper_Esi extends Mage_Core_Helper_Abstract
                 '_secure' => false
             )
         );
-        $esiTag = self::ESI_INCLUDE_OPEN . $url . self::ESI_INCLUDE_CLOSE;
+        $esiTag = self::ESI_INCLUDE_OPEN . preg_replace("/^https/", "http", $url) . self::ESI_INCLUDE_CLOSE;
 
         return $esiTag;
     }

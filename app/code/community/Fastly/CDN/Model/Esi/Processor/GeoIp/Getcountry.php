@@ -73,7 +73,7 @@ class Fastly_CDN_Model_Esi_Processor_GeoIp_Getcountry extends Fastly_CDN_Model_E
                     '_nosid' => true
                 )
             );
-            $output = '<esi:include src="' . $esiUrl . '"/>';
+            $output = '<esi:include src="' . preg_replace("/^https/", "http", $esiUrl) . '"/>';
         }
 
         return $output;

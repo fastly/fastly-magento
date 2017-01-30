@@ -64,7 +64,7 @@ class Fastly_CDN_Model_Esi_Tag_Abstract extends Mage_Core_Model_Abstract
             // make url relative
             $url = str_replace(Mage::getBaseUrl(), '/', $url);
 
-            $esiTag = '<esi:include src="' . $url . '" />';
+            $esiTag = '<esi:include src="' . preg_replace("/^https/", "http", $url) . '" />';
 
             // add plain ESI include URL for debugging
             if ($this->_getHelper()->isEsiDebugEnabled()) {
