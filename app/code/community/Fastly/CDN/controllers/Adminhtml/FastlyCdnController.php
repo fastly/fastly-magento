@@ -21,6 +21,11 @@
 
 class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller_Action
 {
+    /**
+     * @var Fastly_CDN_Model_Statistic
+     */
+    protected $_statistic;
+
     protected function _getSession()
     {
         return Mage::getSingleton('adminhtml/session');
@@ -166,14 +171,35 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
         $result = Mage::getModel('fastlycdn/control')->testConnection($serviceId, $apiKey);
 
         $this->getResponse()->setHeader('Content-type', 'application/json');
+        $statistic = $this->getStatistic();
 
-        $jsonData = Mage::helper('core')->jsonEncode(array('status' => true));
-
-        if(!$result)
-        {
-            $jsonData = Mage::helper('core')->jsonEncode(array('status' => false));
+        if(!$result) {
+            $sendValidationReq = $statistic->sendValidationRequest(false);
+            $this->_saveValidationState(false, $sendValidationReq);
+            return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array('status' =>  false)));
         }
 
-        return $this->getResponse()->setBody($jsonData);
+        $sendValidationReq = $statistic->sendValidationRequest(true);
+        $this->_saveValidationState(true, $sendValidationReq);
+
+        return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array('status' =>  true)));
+    }
+
+    protected function _saveValidationState($serviceStatus, $gaRequestStatus)
+    {
+        $validationStat = $this->getStatistic();
+        $validationStat->setAction($validationStat::FASTLY_VALIDATION_FLAG);
+        $validationStat->setSent($gaRequestStatus);
+        $validationStat->setState($serviceStatus);
+        $validationStat->save();
+    }
+
+    public function getStatistic()
+    {
+        if (!$this->_statistic) {
+            $this->_statistic = Mage::getModel('fastlycdn/statistic');
+        }
+
+        return $this->_statistic;
     }
 }

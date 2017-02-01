@@ -174,12 +174,13 @@ class Fastly_CDN_Model_Control
     }
 
     /**
-     * Fetch fastly
+     * Fetch Fastly API
      *
      * @param $uri
      * @param string $verb
      * @param bool $test
      * @param null $testApiKey
+     * @return bool|Zend_Http_Response
      */
     protected function _fetch($uri, $verb = 'GET', $test = false, $testApiKey = null)
     {
@@ -211,7 +212,7 @@ class Fastly_CDN_Model_Control
 
             return $response;
         } catch (Exception $e) {
-            Mage::helper('fastlycdn')->debug('Purging failed (' . $e->getMessage() . ').');
+            Mage::helper('fastlycdn')->debug('Fetching failed (' . $e->getMessage() . ').');
             return false;
         }
     }

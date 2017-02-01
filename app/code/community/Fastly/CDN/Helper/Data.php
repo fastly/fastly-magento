@@ -31,6 +31,7 @@ class Fastly_CDN_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_FASTLY_CDN_ESI_STRICT_RENDERING_ENABLED  = 'fastlycdn/esi/strict_rendering_enabled';
     const XML_PATH_FASTLY_CDN_ESI_DEBUG_ENABLED             = 'fastlycdn/esi/debug';
     const XML_PATH_FASTLY_CDN_GEOIP_ENABLED                 = 'fastlycdn/geoip/enabled';
+    const XML_FASTLY_GA_CID                                 = 'system/full_page_cache/fastly/fastly_ga_cid';
 
     const PARAM_LAYOUT_NAME    = 'layout_name';
     const PARAM_LAYOUT_HANDLES = 'layout_handles';
@@ -428,5 +429,15 @@ class Fastly_CDN_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return false;
+    }
+
+    /**
+     * Return Google Analytics CID
+     *
+     * @return string
+     */
+    public function getCID()
+    {
+        return Mage::getStoreConfig(self::XML_FASTLY_GA_CID);
     }
 }
