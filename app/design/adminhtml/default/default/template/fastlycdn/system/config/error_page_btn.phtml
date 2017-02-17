@@ -1,0 +1,24 @@
+<?php if (Mage::helper('fastlycdn')->isEnabled()): ?>
+    <?php echo $this->getButtonHtml() ?>
+<?php else: ?>
+    <p><?php echo Mage::helper('fastlycdn')->__('Please enable and configure the extension first. ') ?></p>
+<?php endif; ?>
+<ul class="messages button-messages" id="error-page-btn-success" style="display: none;">
+    <li class="success-msg">
+        <ul>
+            <li>
+                <span></span>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<ul class="messages button-messages" id="error-page-btn-error" style="display: none;">
+    <li class="error-msg">
+        <ul>
+            <li>
+                <span></span>
+            </li>
+        </ul>
+    </li>
+</ul>

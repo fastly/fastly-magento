@@ -79,15 +79,22 @@
                         <test_connection translate="label comment">
                             <label>Test connection</label>
                             <frontend_type>button</frontend_type>
-                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_testConnection</frontend_model>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_testConnectionBtn</frontend_model>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <depends>
-                                <enabled>1</enabled>
-                            </depends>
+                            <depends><enabled>1</enabled></depends>
                         </test_connection>
+                        <upload_vcl translate="label comment">
+                            <label>Automatic upload \ service activation</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_uploadVclBtn</frontend_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store><depends><enabled>1</enabled></depends>
+                        </upload_vcl>
                         <disable_caching translate="label comment">
                             <label>Disable caching</label>
                             <comment>Sets cache control to "private"</comment>
@@ -109,6 +116,19 @@
                             <show_in_store>1</show_in_store>
                             <depends><enabled>1</enabled></depends>
                         </disable_routes>
+                        <toggle_tls translate="label comment">
+                            <label>Force TLS</label>
+                            <comment>Force unencrypted requests over to TLS, return a 301 Moved Permanently response to any unencrypted request, and redirect to the TLS equivalent.</comment>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_toggleTlsBtn</frontend_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <enabled>1</enabled>
+                            </depends>
+                        </toggle_tls>
                         <ttl translate="label comment">
                             <label>Default cache TTL</label>
                             <comment>TTL for cached pages in seconds (e.g. "1800" = page cache is valid for 30 minutes).</comment>
@@ -318,6 +338,42 @@
                         </map_cmsblock>
                     </fields>
                 </geoip>
+                <backend_settings translate="label comment" module="fastlycdn">
+                    <label>Backend settings</label>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <sort_order>40</sort_order>
+                    <fields>
+                        <backends translate="label comment">
+                            <label>Backends</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_backend</frontend_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </backends>
+                    </fields>
+                </backend_settings>
+                <error_maintenance_page translate="label comment" module="fastlycdn">
+                    <label>Error/Maintenance page</label>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <sort_order>50</sort_order>
+                    <fields>
+                        <error_maintenance translate="label comment">
+                            <label>Error Page HTML</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_errorPageBtn</frontend_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </error_maintenance>
+                    </fields>
+                </error_maintenance_page>
             </groups>
         </fastlycdn>
     </sections>

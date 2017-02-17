@@ -1,0 +1,196 @@
+<div id="fastly-modal" style="display:none;">
+
+    <!-- Upload VCL form -->
+
+    <div id="vcl-upload-form">
+        <div class="content-header">
+            <p class="form-buttons"><button id="vcl-upload-form-cancel" title="Cancel" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()"><span><span><span>Back</span></span></span></button><button id="vcl-upload-form-upload" title="Upload" type="button" class="scalable save" onclick="Fastly.uploadVclSnippets(); return false;"><span><span><span>Upload</span></span></span></button></p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg" id="vcl-upload-form-warning-dialog-box"><ul><li><span id="vcl-upload-form-warning-label"></span></li></ul></li>
+                <li class="error-msg" id="vcl-upload-form-error-dialog-box" style="display:none;"><ul><li><span id="vcl-upload-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <table class="form-list" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td class="label"><label for="vcl-upload-form-activate">Activate VCL after upload</label></td>
+                    <td class="value">
+                        <input id="vcl-upload-form-activate" name="vcl-upload-form-activate" value="1" checked="checked" type="checkbox">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <!-- Toggle TLS form -->
+
+    <div id="toggle-tls-form">
+        <div class="content-header">
+            <p class="form-buttons"><button id="toggle-tls-form-cancel" title="Cancel" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()"><span><span><span>Back</span></span></span></button><button id="toggle-tls-form-upload" title="Upload" type="button" class="scalable save" onclick="Fastly.toggleTls(); return false;"><span><span><span>Upload</span></span></span></button></p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg" id="toggle-tls-form-warning-dialog-box"><ul><li><span id="toggle-tls-form-warning-label"></span></li></ul></li>
+                <li class="error-msg" id="toggle-tls-form-error-dialog-box" style="display:none;"><ul><li><span id="toggle-tls-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <table class="form-list" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td class="label"><label for="toggle-tls-form-activate">Activate VCL after upload</label></td>
+                    <td class="value">
+                        <input id="toggle-tls-form-activate" name="toggle-tls-form-activate" value="1" checked="checked" type="checkbox">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <!-- Error page form -->
+
+    <div id="error-page-form">
+        <div class="content-header">
+            <p class="form-buttons"><button id="error-page-form-cancel" title="Cancel" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()"><span><span><span>Back</span></span></span></button><button id="error-page-form-upload" title="Upload" type="button" class="scalable save" onclick="Fastly.updateErrorPage(); return false;"><span><span><span>Upload</span></span></span></button></p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg" id="error-page-form-warning-dialog-box"><ul><li><span id="error-page-form-warning-label"></span></li></ul></li>
+                <li class="error-msg" id="error-page-form-error-dialog-box" style="display:none;"><ul><li><span id="error-page-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <table class="form-list" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td class="label"><label for="error-page-form-activate">Activate after the change</label></td>
+                    <td class="value">
+                        <input id="error-page-form-activate" name="error-page-form-activate" value="1" checked="checked" type="checkbox">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="error-page-form-html">HTML</label></td>
+                    <td class="value">
+                        <textarea rows="10" name="error-page-form-html" required="required" id="error-page-form-html"></textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <!-- Backend config form -->
+
+    <div id="backend-config-form">
+        <div class="content-header">
+            <p class="form-buttons"><button id="backend-config-form-cancel" title="Cancel" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()"><span><span><span>Back</span></span></span></button><button id="backend-config-form-upload" title="Upload" type="button" class="scalable save" onclick="Fastly.updateBackend(); return false;"><span><span><span>Upload</span></span></span></button></p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg" id="backend-config-form-warning-dialog-box"><ul><li><span id="backend-config-form-warning-label"></span></li></ul></li>
+                <li class="error-msg" id="backend-config-form-error-dialog-box" style="display:none;"><ul><li><span id="backend-config-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" id="backend-config-form-real" class="form-inline" enctype="multipart/form-data">
+            <table class="form-list" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td><input hidden="hidden" name="backend-config-form-name" id="backend-config-form-name" value=""></td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="backend-config-form-shield">Shield</label></td>
+                    <td class="value">
+                        <select name="backend-config-form-shield" id="backend-config-form-shield">
+                            <option value="">(none)</option>
+                            <option value="fjr-ae">AE, Fujairah Al Mahta - Dubai</option>
+                            <option value="brisbane-au">AU, Brisbane</option>
+                            <option value="melbourne-au">AU, Melbourne</option>
+                            <option value="perth-au">AU, Perth</option>
+                            <option value="sydney-au">AU, Sydney</option>
+                            <option value="gru-br-sa">BR, Sao Paulo</option>
+                            <option value="yyz-on-ca">CA, Toronto</option>
+                            <option value="yul-montreal-ca">CA, Montreal</option>
+                            <option value="mad-madrid-es">ES, Madrid</option>
+                            <option value="cdg-par-fr">FR, Paris</option>
+                            <option value="hongkong-hk">HK, Hong Kong</option>
+                            <option value="hhn-frankfurt-de">DE, Frankfurt - Interxion</option>
+                            <option value="frankfurt-de">DE, Frankfurt - Recommended for AWS eu-central1 origins</option>
+                            <option value="tokyo-jp2">JP, Tokyo</option>
+                            <option value="osaka-jp">JP, Osaka</option>
+                            <option value="amsterdam-nl">NL, Amsterdam - Recommended for GCP eu-west1 origins</option>
+                            <option value="auckland-akl">NZ, Auckland</option>
+                            <option value="wellington-wlg">NZ, Wellington</option>
+                            <option value="stockholm-bma">SE, Stockholm</option>
+                            <option value="singapore-sg">SG, Singapore</option>
+                            <option value="london_city-uk">UK, London - LCY</option>
+                            <option value="london-uk">UK, London - LHR - Recommended for AWS eu-west1/2 origins</option>
+                            <option value="atl-ga-us">US, Atlanta, GA</option>
+                            <option value="bos-ma-us">US, Boston, MA</option>
+                            <option value="ord-il-us">US, Chicago, IL - Recommended for GCP us-central1</option>
+                            <option value="den-co-us">US, Denver, CO</option>
+                            <option value="dallas-tx-us">US, Dallas, TX</option>
+                            <option value="iad-va-us">US, Washington, DC - Recommended for AWS us-east1/GCP us-east1 origins</option>
+                            <option value="lax-ca-us">US, Los Angeles, CA</option>
+                            <option value="miami-fl-us">US, Miami, FL</option>
+                            <option value="jfk-ny-us">US, New York City, NY</option>
+                            <option value="sjc-ca-us">US, San Jose, CA</option>
+                            <option value="sea-wa-us">US, Seattle, WA - Recommended for AWS us-west2 origins</option>
+                        </select>
+                        <p class="note"><span>The shield POP designated to reduce inbound load on this origin by serving
+                                the cached data to the rest of the network. <a target="_blank" href="https://docs.fastly.com/guides/performance-tuning/shielding">Click for more details.</a></span></p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label"><label for="backend-config-form-connection-timeout">Connection timeout</label></td>
+                    <td class="value">
+                        <input name="backend-config-form-connection-timeout" value="" class="input-text required-entry validate-number" id="backend-config-form-connection-timeout">
+                        <p class="note"><span>How long to wait for a timeout in milliseconds.</span></p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label"><label for="backend-config-form-between-bytes-timeout">Between bytes timeout</label></td>
+                    <td class="value">
+                        <input name="backend-config-form-between-bytes-timeout" class="input-text required-entry validate-number" id="backend-config-form-between-bytes-timeout">
+                        <p class="note"><span>How long to wait between bytes in milliseconds.</span></p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label"><label for="backend-config-form-first-byte-timeout">First byte timeout</label></td>
+                    <td class="value">
+                        <input name="backend-config-form-between-bytes-timeout" class="input-text required-entry validate-number" id="backend-config-form-first-byte-timeout">
+                        <p class="note"><span>How long to wait for the first bytes in milliseconds.</span></p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label"><label for="backend-config-form-activate">Activate after the change</label></td>
+                    <td class="value">
+                        <input id="backend-config-form-activate" name="error-page-form-activate" value="1" checked="checked" type="checkbox">
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+
+<script>
+    var check_service_url = '<?php echo $this->getUrl('*/fastlyCdn/checkServiceDetails');?>';
+    var upload_snippets_url = '<?php echo $this->getUrl('*/fastlyCdn/uploadVclSnippets');?>';
+    var is_enabled = '<?php echo Mage::helper('fastlycdn')->isEnabled() ?>';
+    var check_tls_url = '<?php echo $this->getUrl('*/fastlyCdn/checkTlsSetting');?>';
+    var toggle_tls_url = '<?php echo $this->getUrl('*/fastlyCdn/toggleTls');?>';
+    var update_error_page_url = '<?php echo $this->getUrl('*/fastlyCdn/updateErrorPageHtml');?>';
+    var get_error_page_resp_obj_url = '<?php echo $this->getUrl('*/fastlyCdn/getErrorPageRespObj');?>';
+    var get_backends_url = '<?php echo $this->getUrl('*/fastlyCdn/getBackends');?>';
+    var update_backend_url = '<?php echo $this->getUrl('*/fastlyCdn/updateBackend');?>';
+</script>

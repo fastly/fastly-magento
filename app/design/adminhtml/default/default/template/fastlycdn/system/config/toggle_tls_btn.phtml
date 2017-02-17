@@ -1,0 +1,44 @@
+<?php echo $this->getButtonHtml() ?>
+
+<span class="collect-indicator" id="request_state_span" style="margin-left:10px;">
+    <span id="fastly_request_state_message_span"><b>Current state:</b>
+        <img class="processing" id="force-tls-processing" alt="Collecting" style="display:none; margin:0 5px" src="<?php echo Mage::getDesign()->getSkinBaseUrl(array('_area'=>'adminhtml')).'images/rule-ajax-loader.gif'?>"/>
+        <span style="display:none;" class="request_tls_state_span" id="force_tls_state_enabled"> enabled</span>
+        <span style="display:none;" class="request_tls_state_span" id="force_tls_state_disabled"> disabled</span>
+        <span style="display:none;" class="request_tls_state_span" id="force_tls_state_unknown"> unknown</span>
+    </span>
+</span>
+
+<ul class="messages button-messages" id="toggle-tls-btn-success" style="display: none;">
+    <li class="success-msg">
+        <ul>
+            <li>
+                <span></span>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<ul class="messages button-messages" id="toggle-tls-btn-error" style="display: none;">
+    <li class="error-msg">
+        <ul>
+            <li>
+                <span></span>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<style type="text/css">
+    #force_tls_state_enabled {
+        color: #008000;
+    }
+
+    #force_tls_state_disabled {
+        color: #808080;
+    }
+
+    #force_tls_state_unknown {
+        color: #ff0000;
+    }
+</style>
