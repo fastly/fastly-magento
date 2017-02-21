@@ -9,3 +9,6 @@ app/etc/fastlycdn.xml app/etc/fastlycdn.xml
 app/etc/modules/Fastly_CDN.xml app/etc/modules/Fastly_CDN.xml
 app/locale/de_DE/Fastly_CDN.csv app/locale/de_DE/Fastly_CDN.csv
 app/locale/en_US/Fastly_CDN.csv app/locale/en_US/Fastly_CDN.csv
+skin/adminhtml/default/default/css/fastlycdn/fastly.css skin/adminhtml/default/default/css/fastlycdn/fastly.css
+skin/adminhtml/default/default/js/fastlycdn/fastly.js skin/adminhtml/default/default/js/fastlycdn/fastly.js
+
