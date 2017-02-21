@@ -214,7 +214,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             return $this->getResponse()->setBody($jsonData);
 
         } catch (\Exception $e) {
-            $jsonData = Mage::helper('core')->jsonEncode(array('status' => false, 'error' => array('msg' => $e->getMessage())));
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'error' => array('msg' => $e->getMessage())));
             return $this->getResponse()->setBody($jsonData);
         }
     }
@@ -305,7 +305,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             return $this->getResponse()->setBody($jsonData);
 
         } catch (\Exception $e) {
-            $jsonData = Mage::helper('core')->jsonEncode(array('status' => false, 'error' => array('msg' => $e->getMessage())));
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
             return $this->getResponse()->setBody($jsonData);
         }
     }
@@ -403,7 +403,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true));
             return $this->getResponse()->setBody($jsonData);
         } catch (\Exception $e) {
-            $jsonData = Mage::helper('core')->jsonEncode(array('status' => false, 'error' => array('msg' => $e->getMessage())));
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
             return $this->getResponse()->setBody($jsonData);
         }
     }
@@ -425,7 +425,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'errorPageResp' => $response));
             return $this->getResponse()->setBody($jsonData);
         } catch (\Exception $e) {
-            $jsonData = Mage::helper('core')->jsonEncode(array('status' => false, 'error' => array('msg' => $e->getMessage())));
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
             return $this->getResponse()->setBody($jsonData);
         }
     }
@@ -516,7 +516,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'active_version' => $clone->number));
             return $this->getResponse()->setBody($jsonData);
         } catch (\Exception $e) {
-            $jsonData = Mage::helper('core')->jsonEncode(array('status' => false, 'error' => array('msg' => $e->getMessage())));
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
             return $this->getResponse()->setBody($jsonData);
         }
     }
@@ -536,7 +536,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'backends' => $backends));
             return $this->getResponse()->setBody($jsonData);
         } catch (\Exception $e) {
-            $jsonData = Mage::helper('core')->jsonEncode(array('status' => false, 'error' => array('msg' => $e->getMessage())));
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
             return $this->getResponse()->setBody($jsonData);
         }
     }
@@ -600,7 +600,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'active_version' => $clone->number, 'backends' => $configureBackend));
             return $this->getResponse()->setBody($jsonData);
         } catch (\Exception $e) {
-            $jsonData = Mage::helper('core')->jsonEncode(array('status' => false, 'error' => array('msg' => $e->getMessage())));
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
             return $this->getResponse()->setBody($jsonData);
         }
     }

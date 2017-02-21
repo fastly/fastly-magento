@@ -1,9 +1,9 @@
 document.observe("dom:loaded", function() {
 
     $('fastlycdn_general_enabled').observe('change', function (event) {
-            $('row_fastlycdn_general_test_connection').toggle(event.findElement().value);
-            $('row_fastlycdn_general_upload_vcl').toggle(event.findElement().value);
-            $('row_fastlycdn_general_toggle_tls').toggle(event.findElement().value);
+        $('row_fastlycdn_general_test_connection').toggle(event.findElement().value);
+        $('row_fastlycdn_general_upload_vcl').toggle(event.findElement().value);
+        $('row_fastlycdn_general_toggle_tls').toggle(event.findElement().value);
     });
 
     if (is_enabled == true) {
@@ -12,6 +12,7 @@ document.observe("dom:loaded", function() {
         $('row_fastlycdn_general_test_connection').hide();
         $('row_fastlycdn_general_upload_vcl').hide();
         $('row_fastlycdn_general_toggle_tls').hide();
+        $('force_tls_state_unknown').show();
     }
 });
 
@@ -79,7 +80,7 @@ var Fastly = {
                             active_version: this.activeVersion
                         },
                         onCreate: function () {
-                          $('force-tls-processing').show();
+                            $('force-tls-processing').show();
                         },
                         onSuccess: function(transport) {
                             var checkReqSetting = transport.responseText.evalJSON();
@@ -135,6 +136,9 @@ var Fastly = {
                             // TO DO ERROR HANDLING
                         }
                     });
+                } else {
+                    $('force_tls_state_unknown').show();
+                    $('backends-loading').hide();
                 }
             }.bind(this),
             onFailure: function() { alert('Something went wrong...'); }
@@ -148,7 +152,9 @@ var Fastly = {
             onSuccess: function(transport) {
                 var response = transport.responseText.evalJSON();
                 if(response.error || response.status == false) {
-                    // TO DO ERROR HANDLING
+                    var errorBtn = divId.replace('-form', '') + '-btn-error';
+                    var errorMsg = 'Please check your Service ID and API key and try again.';
+                    return this.setButtonMsg(errorMsg, errorBtn);
                 }
 
                 this.service = response;
@@ -213,12 +219,12 @@ var Fastly = {
             },
             onSuccess: function(transport) {
                 var response = transport.responseText.evalJSON();
-                if(response.error || response.status == false) {
-                    // TO DO ERROR HANDLING
+                if(response.status == false) {
+                    return this.setDialogMessage(response.msg, this.divId, 'error');
                 }
 
                 var successMsg = 'VCL file is successfully uploaded to the Fastly service.';
-                this.setButtonMsg(successMsg, 'upload-vcl-btn-success');
+                this.setButtonMsg(successMsg, 'vcl-upload-btn-success');
                 this.closeDialogWindow();
             }.bind(this),
             onFailure: function() { alert('Something went wrong...'); }
@@ -241,9 +247,10 @@ var Fastly = {
             },
             onSuccess: function(transport) {
                 var response = transport.responseText.evalJSON();
-                if(response.error || response.status == false) {
-                    // TO DO ERROR HANDLING
+                if(response.status == false) {
+                    return this.setDialogMessage(response.msg, this.divId, 'error');
                 }
+
                 var successMsg = '';
                 if(this.tlsStatus) {
                     this.tlsStatus = false;
@@ -282,12 +289,8 @@ var Fastly = {
             },
             onSuccess: function(transport) {
                 var response = transport.responseText.evalJSON();
-                if(response.error || response.status == false) {
-                    if(response.error.msg) {
-                        return this.setDialogMessage(response.error.msg, this.divId, 'error');
-                    } else {
-                        return this.setDialogMessage(response.msg, this.divId, 'error');
-                    }
+                if(response.status == false) {
+                    return this.setDialogMessage(response.msg, this.divId, 'error');
                 }
 
                 var successMsg = 'Error page HTML is successfully updated.';
@@ -323,12 +326,8 @@ var Fastly = {
                 },
                 onSuccess: function(transport) {
                     var response = transport.responseText.evalJSON();
-                    if(response.error || response.status == false) {
-                        if(response.error.msg) {
-                            return this.setDialogMessage(response.error.msg, this.divId, 'error');
-                        } else {
-                            return this.setDialogMessage(response.msg, this.divId, 'error');
-                        }
+                    if(response.status == false) {
+                        return this.setDialogMessage(response.msg, this.divId, 'error');
                     }
 
                     this.backends.splice(this.backendId, 1, response.backends);
@@ -342,9 +341,9 @@ var Fastly = {
     },
 
     setButtonMsg: function (msg, btnId) {
-          var successBtn = $(btnId);
-          successBtn.select('span')[0].update(msg);
-          successBtn.show();
+        var btn = $(btnId);
+        btn.select('span')[0].update(msg);
+        btn.show();
     },
 
     setDialogMessage: function (msg, divId, type) {
@@ -366,7 +365,7 @@ var Fastly = {
     hideAllBtnMessages: function () {
         var messages = $$('ul.button-messages');
         messages.each(function (elem) {
-           elem.hide();
+            elem.hide();
         });
     },
 

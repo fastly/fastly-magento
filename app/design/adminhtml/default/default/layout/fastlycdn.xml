@@ -24,17 +24,7 @@
 <layout>
     <adminhtml_system_config_edit>
         <reference name="head">
-            <action method="addItem">
-                <type>skin_js</type>
-                <name>js/fastly.js</name>
-            </action>
-            <action method="addItem">
-                <type>skin_css</type>
-                <name>css/fastly.css</name>
-            </action>
-            <action method="addCss">
-                <name>lib/prototype/windows/themes/magento.css</name>
-            </action>
+            <block type="fastlycdn/adminhtml_head" name="namespace_adminhtml_head" as="namespace_adminhtml_head" />
         </reference>
         <reference name="content">
             <block type="fastlycdn/adminhtml_system_config_dialogs" name="fastly.modal"/>
