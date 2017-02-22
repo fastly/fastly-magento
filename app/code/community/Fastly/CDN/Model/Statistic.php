@@ -20,6 +20,12 @@ class Fastly_CDN_Model_Statistic extends Mage_Core_Model_Abstract
     const FASTLY_CONFIGURATION_FLAG = 'configuration';
     const FASTLY_VALIDATION_FLAG = 'validation';
 
+    /**
+     * Fastly upgrade flag
+     */
+    const FASTLY_UPGRADE_FLAG = 'upgrade';
+    const FASTLY_UPGRADED_FLAG = 'upgraded';
+
     const FASTLY_MODULE_NAME = 'Fastly_Cdn';
     const CACHE_TAG = 'fastly_cdn_statistic';
     const FASTLY_GA_TRACKING_ID = 'UA-89025888-2';
@@ -175,8 +181,14 @@ class Fastly_CDN_Model_Statistic extends Mage_Core_Model_Abstract
             'cd3'   =>  $this->getWebsiteName(),
             // Site domain
             'cd4'   =>  $_SERVER['HTTP_HOST'],
-            //
-            //'cd5'   =>  $this->getSiteLocation()
+            // Site location
+            'cd5'   =>  $this->getSiteLocation(),
+            // Fastly version
+            'cd6'   =>  $this->getHelper()->getModuleVersion()->version,
+            // CID
+            'cd7'   =>  $this->getHelper()->getCID(),
+            // Anti spam protection
+            'cd8'   =>  'fastlyext'
         ];
 
         return $customVars;
@@ -189,26 +201,26 @@ class Fastly_CDN_Model_Statistic extends Mage_Core_Model_Abstract
      */
     public function getSiteLocation()
     {
-        $countryId = $this->_scopeConfig->getValue('general/store_information/country_id');
-        if($countryId) {
-            $country = $this->_countryInformation->getCountryInfo($countryId);
-            $countryName = $country->getFullNameEnglish();
+        $countryCode = Mage::getStoreConfig('general/country/default');
+        if($countryCode) {
+            $country = Mage::getModel('directory/country')->loadByCode($countryCode);
+            $countryName = $country->getName();
         } else {
             $countryName = 'Unknown country';
         }
 
-        $regionId = $this->_scopeConfig->getValue('general/store_information/region_id');
         $regionName = 'Unknown region';
-        if($regionId) {
-            $region = $this->_regionFactory->create();
-            $region = $region->load($regionId);
+        $region_id = Mage::getStoreConfig('shipping/origin/region_id');
+
+        if ($region_id) {
+            $region = Mage::getModel('directory/region')->load($region_id);
             if($region->getId()) {
                 $regionName = $region->getName();
             }
         }
 
-        $postCode = $this->_scopeConfig->getValue('general/store_information/postcode');
-        if(!$postCode) {
+        $postCode = Mage::getStoreConfig('shipping/origin/region_id');
+        if (!$postCode) {
             $postCode = 'Unknown zip code';
         }
 
@@ -344,6 +356,36 @@ class Fastly_CDN_Model_Statistic extends Mage_Core_Model_Abstract
         $eventParams = [
             'ec'    =>  self::GA_FASTLY_SETUP,
             'ea'    =>  'Fastly '.$configuredState,
+            'el'    =>  $this->getWebsiteName(),
+            'ev'    =>  $this->daysFromInstallation(),
+            't'     =>  self::GA_HITTYPE_EVENT
+        ];
+
+        $result = $this->_sendReqToGA(array_merge($pageViewParams, $eventParams));
+
+        return $result;
+    }
+
+    /**
+     * Sends Fastly upgrade request
+     *
+     * @return bool|Zend_Http_Response
+     */
+    public function sendUpgradeRequest()
+    {
+        $pageViewParams = [
+            'dl'    =>  self::GA_PAGEVIEW_URL . self::FASTLY_UPGRADED_FLAG,
+            'dh'    =>  preg_replace('#^https?://#', '', rtrim(self::GA_PAGEVIEW_URL,'/')),
+            'dp'    =>  '/'.self::FASTLY_UPGRADED_FLAG,
+            'dt'    =>  ucfirst(self::FASTLY_UPGRADED_FLAG),
+            't'     =>  self::GA_HITTYPE_PAGEVIEW,
+        ];
+
+        $this->_sendReqToGA($pageViewParams);
+
+        $eventParams = [
+            'ec'    =>  self::GA_FASTLY_SETUP,
+            'ea'    =>  'Fastly '.self::FASTLY_UPGRADED_FLAG,
             'el'    =>  $this->getWebsiteName(),
             'ev'    =>  $this->daysFromInstallation(),
             't'     =>  self::GA_HITTYPE_EVENT
