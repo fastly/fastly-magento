@@ -170,14 +170,9 @@ var Fastly = {
                         },
                         onSuccess: function(transport) {
                             var response = transport.responseText.evalJSON();
-                            if (response.error || response.status == false) {
-                                if(typeof response.error === 'undefined') {
-                                    return this.setDialogMessage(response.msg, this.divId, 'error');
-                                } else {
-                                    return this.setDialogMessage(response.error.msg, this.divId, 'error');
-                                }
+                            if(response.status != false) {
+                                $('error-page-form-html').update(response.errorPageResp.content);
                             }
-                            $('error-page-form-html').update(response.errorPageResp.content);
                         }.bind(this),
                         onFailure: function() { alert('Something went wrong...'); }
                     });
