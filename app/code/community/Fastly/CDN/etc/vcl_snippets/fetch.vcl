@@ -1,8 +1,20 @@
-    if (beresp.status >= 500) {
+    if (beresp.status >= 500 && beresp.status < 600) {
         # let SOAP errors pass - better debugging
         if (beresp.http.Content-Type ~ "text/xml") {
             return (deliver);
         }
+
+        /* deliver stale if the object is available */
+        if (stale.exists) {
+            return(deliver_stale);
+        }
+
+        if (req.restarts < 1 && (req.request == "GET" || req.request == "HEAD")) {
+            restart;
+        }
+
+        /* else go to vcl_error to deliver a synthetic */
+        error 503;
 
     }
 
@@ -10,7 +22,7 @@
         set beresp.http.Fastly-Restarts = req.restarts;
     }
 
-    if (beresp.http.Content-Type ~ "text/(html|xml)" ) {
+    if (beresp.http.Content-Type ~ "text/(html|xml)") {
         # enable ESI feature for Magento response by default
         esi;
         if (!beresp.http.Vary ~ "Fastly-Cdn-Env,Https") {
@@ -25,7 +37,7 @@
         set beresp.http.x-compress-hint = "on";
     } else {
         # enable gzip for all static content
-        if ((beresp.status == 200 || beresp.status == 404) && (beresp.http.content-type ~ "^(application\/x\-javascript|text\/css|application\/javascript|text\/javascript|application\/json|application\/vnd\.ms\-fontobject|application\/x\-font\-opentype|application\/x\-font\-truetype|application\/x\-font\-ttf|application\/xml|font\/eot|font\/opentype|font\/otf|image\/svg\+xml|image\/vnd\.microsoft\.icon|text\/plain)\s*($|;)" || req.url ~ "\.(css|js|html|eot|ico|otf|ttf|json)($|\?)" ) ) {
+        if (http_status_matches(beresp.status, "200,404") && (beresp.http.content-type ~ "^(application\/x\-javascript|text\/css|application\/javascript|text\/javascript|application\/json|application\/vnd\.ms\-fontobject|application\/x\-font\-opentype|application\/x\-font\-truetype|application\/x\-font\-ttf|application\/xml|font\/eot|font\/opentype|font\/otf|image\/svg\+xml|image\/vnd\.microsoft\.icon|text\/plain)\s*($|;)" || req.url.ext ~ "(?i)(css|js|html|eot|ico|otf|ttf|json)" ) ) {
             # always set vary to make sure uncompressed versions dont always win
             if (!beresp.http.Vary ~ "Accept-Encoding") {
                 if (beresp.http.Vary) {
@@ -41,7 +53,7 @@
     }
 
     if (http_status_matches(beresp.status, "200,301,404") && !req.http.X-Pass) {
-        if (beresp.http.Content-Type ~ "text/html" || beresp.http.Content-Type ~ "text/xml") {
+        if (beresp.http.Content-Type ~ "text/(html|xml)") {
             # marker for vcl_deliver to reset Age:
             set beresp.http.magentomarker = "1";
 
