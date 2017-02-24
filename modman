@@ -1,5 +1,7 @@
-README.md README.md
-LICENSE.txt LICENSE.txt
+README.md app/code/community/Fastly/CDN/README.md
+LICENSE.txt app/code/community/Fastly/CDN/LICENSE.txt
+composer.json app/code/community/Fastly/CDN/composer.json
+modman app/code/community/Fastly/CDN/modman
 app/code/community/Fastly/CDN/* app/code/community/Fastly/CDN/
 app/design/adminhtml/default/default/layout/fastlycdn.xml app/design/adminhtml/default/default/layout/fastlycdn.xml
 app/design/adminhtml/default/default/template/fastlycdn/* app/design/adminhtml/default/default/template/fastlycdn/
