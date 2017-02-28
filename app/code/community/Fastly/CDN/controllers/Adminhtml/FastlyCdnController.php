@@ -214,7 +214,6 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
         }
 
         return $this->_statistic;
-        return $this->getResponse()->setBody($jsonData);
     }
 
     /**
