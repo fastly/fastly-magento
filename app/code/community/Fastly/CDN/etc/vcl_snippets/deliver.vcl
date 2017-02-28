@@ -1,6 +1,6 @@
     # Add an easy way to see whether custom Fastly VCL has been uploaded
     if ( req.http.Fastly-Debug ) {
-        set resp.http.Fastly-Magento-VCL-Uploaded = "1.0.7";
+        set resp.http.Fastly-Magento-VCL-Uploaded = "1.0.8";
     } else {
         remove resp.http.Fastly-Module-Enabled;
     }
@@ -35,5 +35,4 @@
         set resp.http.Cache-Control = "no-store, no-cache, must-revalidate, post-check=0, pre-check=0";
         set resp.http.Pragma        = "no-cache";
         set resp.http.Expires       = "Mon, 31 Mar 2008 10:00:00 GMT";
-        set resp.http.Age           = "0";
     }

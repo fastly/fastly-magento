@@ -443,6 +443,32 @@ class Fastly_CDN_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Determine currently service active version and the next version in which the active version will be cloned
+     *
+     * @param array $versions
+     * @return array
+     */
+    public function determineVersions(array $versions)
+    {
+        $activeVersion = null;
+        $nextVersion = null;
+
+        if(!empty($versions))
+        {
+            foreach($versions as $version)
+            {
+                if($version->active) {
+                    $activeVersion = $version->number;
+                }
+            }
+
+            $nextVersion = (int) end($versions)->number + 1;
+        }
+
+        return array('active_version' => $activeVersion, 'next_version' => $nextVersion);
+    }
+
+    /**
      * Return Google Analytics CID
      *
      * @return string

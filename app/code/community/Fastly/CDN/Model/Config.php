@@ -21,6 +21,16 @@
 
 class Fastly_CDN_Model_Config
 {
+    /**
+     * Magento module prefix used for naming vcl snippets, condition and request
+     */
+    const FASTLY_MAGENTO_MODULE = 'magentomodule';
+
+    /**
+     * Magento Error Page Response Object Name
+     */
+    const ERROR_PAGE_RESPONSE_OBJECT = self::FASTLY_MAGENTO_MODULE.'_error_page_response_object';
+
     protected $_esiTags = null;
     
     public function getEsiTags()
@@ -68,5 +78,34 @@ class Fastly_CDN_Model_Config
             return $esiTags[$configKey];
         }
         return false;
+    }
+
+    public function getVclSnippets($path = 'vcl_snippets', $specificFile = null)
+    {
+        $snippetsData = array();
+
+        $moduleEtcPath = Mage::getModuleDir('etc', 'Fastly_CDN') . DS . $path . DS;
+        $fileReader = new Varien_Io_File();
+        $fileReader->open(array('path' => $moduleEtcPath));
+        if (!$specificFile) {
+            $snippets = $fileReader->ls();
+            if(is_array($snippets))
+            {
+                foreach ($snippets as $snippet) {
+                    if ($snippet['filetype'] != 'vcl') {
+                        continue;
+                    }
+                    $snippetFilePath = $moduleEtcPath . $snippet['text'];
+                    $type = explode('.', $snippet['text'])[0];
+                    $snippetsData[$type] = $fileReader->read($snippetFilePath);
+                }
+            }
+        } else {
+            $snippetFilePath = $moduleEtcPath . '/' . $specificFile;
+            $type = explode('.', $specificFile)[0];
+            $snippetsData[$type] = $fileReader->read($snippetFilePath);
+        }
+
+        return $snippetsData;
     }
 }

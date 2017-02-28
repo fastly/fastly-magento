@@ -1,0 +1,40 @@
+<div id="fastlycdn_esi_blocks_ttl">
+    <?php if (Mage::helper('fastlycdn')->isEnabled()): ?>
+    <div class="grid" style="">
+        <table class="border" cellspacing="0" cellpadding="0">
+            <thead>
+            <tr class="headings">
+                <th>Name</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="fastly-backends-list">
+            <tr id="backends-loading">
+                <td align="center"><p><img src="<?php echo Mage::getDesign()->getSkinBaseUrl(array('_area'=>'adminhtml')).'images/rule-ajax-loader.gif'?>"/> <?php echo Mage::helper('fastlycdn')->__('Loading...'); ?></p></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+        <ul class="messages button-messages" id="backend-config-btn-success" style="display: none;">
+            <li class="success-msg">
+                <ul>
+                    <li>
+                        <span></span>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <ul class="messages button-messages" id="backend-config-btn-error" style="display: none;">
+            <li class="error-msg">
+                <ul>
+                    <li>
+                        <span></span>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    <?php else: ?>
+        <p><?php echo Mage::helper('fastlycdn')->__('Please enable and configure the extension first. ') ?></p>
+    <?php endif; ?>
+</div>

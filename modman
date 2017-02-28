@@ -1,7 +1,9 @@
-README.md README.md
-LICENSE.txt LICENSE.txt
+README.md app/code/community/Fastly/CDN/README.md
+LICENSE.txt app/code/community/Fastly/CDN/LICENSE.txt
+composer.json app/code/community/Fastly/CDN/composer.json
+modman app/code/community/Fastly/CDN/modman
 app/code/community/Fastly/CDN/* app/code/community/Fastly/CDN/
-app/design/adminhtml/default/default/layout/fastlycdn.xml app/design/adminhtml/default/default/fastlycdn.xml
+app/design/adminhtml/default/default/layout/fastlycdn.xml app/design/adminhtml/default/default/layout/fastlycdn.xml
 app/design/adminhtml/default/default/template/fastlycdn/* app/design/adminhtml/default/default/template/fastlycdn/
 app/design/frontend/base/default/layout/fastlycdn.xml app/design/frontend/base/default/layout/fastlycdn.xml
 app/design/frontend/base/default/template/fastlycdn/* app/design/frontend/base/default/template/fastlycdn/
@@ -9,3 +11,6 @@ app/etc/fastlycdn.xml app/etc/fastlycdn.xml
 app/etc/modules/Fastly_CDN.xml app/etc/modules/Fastly_CDN.xml
 app/locale/de_DE/Fastly_CDN.csv app/locale/de_DE/Fastly_CDN.csv
 app/locale/en_US/Fastly_CDN.csv app/locale/en_US/Fastly_CDN.csv
+skin/adminhtml/default/default/css/fastlycdn/fastly.css skin/adminhtml/default/default/css/fastlycdn/fastly.css
+skin/adminhtml/default/default/js/fastlycdn/fastly.js skin/adminhtml/default/default/js/fastlycdn/fastly.js
+

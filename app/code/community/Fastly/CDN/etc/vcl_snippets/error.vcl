@@ -22,7 +22,7 @@
     # formkey request
     if (obj.status == 760) {
         set obj.status = 200;
-	    synthetic obj.response;
+        synthetic obj.response;
         return (deliver);
     }
 
