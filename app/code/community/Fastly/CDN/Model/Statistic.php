@@ -116,11 +116,15 @@ class Fastly_CDN_Model_Statistic extends Mage_Core_Model_Abstract
         // Magento version
         $mandatoryReqData['ua'] = Mage::getVersion();
 
+        // Data Source parameter is used to filter spam hits
+        $mandatoryReqData['ds'] = 'Fastly';
+
         $countryCode = Mage::getStoreConfig('general/country/default');
+
         if($countryCode) {
             $country = Mage::getModel('directory/country')->loadByCode($countryCode);
             // Country code
-            $mandatoryReqData['geoid'] = $countryCode;
+            $mandatoryReqData['geoid'] = $country->getName();
         }
 
         $customVars = $this->_prepareCustomVariables();
@@ -184,9 +188,9 @@ class Fastly_CDN_Model_Statistic extends Mage_Core_Model_Abstract
             // Site location
             'cd5'   =>  $this->getSiteLocation(),
             // Fastly version
-            'cd6'   =>  $this->getHelper()->getModuleVersion()->version,
+            'cd6'   =>  Mage::helper('fastlycdn')->__(Mage::getConfig()->getNode('modules/Fastly_CDN/version')),
             // CID
-            'cd7'   =>  $this->getHelper()->getCID(),
+            'cd7'   =>  (!$this->_cid) ? $this->getHelper()->getCID() : $this->_cid,
             // Anti spam protection
             'cd8'   =>  'fastlyext'
         ];

@@ -57,7 +57,7 @@ if($connection->isTableExists($tableName) == true) {
 
     $statistic = Mage::getModel('fastlycdn/statistic');
     $cid = $statistic->generateCid();
-    Mage::getConfig()->saveConfig('system/full_page_cache/fastly/current_version', Mage::helper('fastlycdn')->getModuleVersion());
+    Mage::getConfig()->saveConfig('system/full_page_cache/fastly/current_version', Mage::helper('fastlycdn')->__(Mage::getConfig()->getNode('modules/Fastly_CDN/version')));
     Mage::getConfig()->saveConfig('system/full_page_cache/fastly/fastly_ga_cid', $cid);
 
     $sendInstalledReq = $statistic->sendInstalledReq();
