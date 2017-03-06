@@ -113,14 +113,16 @@ var Fastly = {
                             if(response.status != false) {
                                 var index = 0;
                                 this.backends = response.backends;
+                                var html = '';
                                 response.backends.each(function(backend) {
-                                    var html = "<tr id='fastly_" + index + "'>";
+                                    html += "<tr id='fastly_" + index + "'>";
                                     html += "<td><input name='backend_name_"+index+"' disabled='disabled' id='backend_name_"+index+"' title='Backend name' value='"+backend.name+"' class='input-text' style='width:180px' type='text'></td>";
                                     html += "<td style='text-align:center;'><button data-backendId='"+ index +"' class='backend-edit-btn' type='button'><span><span><span>Edit</span></span></span></button></td>";
                                     html += "</tr>";
-                                    $('fastly-backends-list').update(html);
                                     index++;
                                 });
+
+                                $('fastly-backends-list').update(html);
                                 var self = this;
                                 $$('.backend-edit-btn').each(function(element) {
                                     element.observe('click', function (event) {
