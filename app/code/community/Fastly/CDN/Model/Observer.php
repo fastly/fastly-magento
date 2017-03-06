@@ -432,8 +432,8 @@ class Fastly_CDN_Model_Observer
             if ($this->_getHelper()->isEsiDebugEnabled()) {
                 // keep original block content and wrap it with <esi:remove> tag
                 $blockHtml .= $esiTag->getStartRemoveTag()
-                           . $transport->getHtml()
-                           . $esiTag->getEndRemoveTag();
+                    . $transport->getHtml()
+                    . $esiTag->getEndRemoveTag();
             }
             $blockHtml .= $esiTag->getEsiIncludeTag($block);
             $transport->setHtml($blockHtml);
@@ -752,5 +752,64 @@ class Fastly_CDN_Model_Observer
             true,
             Fastly_CDN_Model_Esi_Tag_Reports_Product_Compared::COOKIE_NAME
         );
+    }
+
+    /**
+     * Sends installed request to GA
+     */
+    public function installedEvent()
+    {
+        if (Mage::helper('core')->isModuleEnabled('Fastly_CDN')) {
+
+            $resource = Mage::getSingleton('core/resource');
+            $statistic = Mage::getModel('fastlycdn/statistic');
+            $tableName = $resource->getTableName('fastlycdn/statistics');
+
+            if($resource->getConnection('core_read')->isTableExists($tableName)) {
+                $stat = $statistic->getCollection()->getStatByAction($statistic::FASTLY_INSTALLED_FLAG);
+
+                if($stat->getSent() == false) {
+                    $sendGAReq = $statistic->sendInstalledReq();
+                    if($sendGAReq) {
+                        $statistic->load($stat->getId());
+                        $statistic->setState(false);
+                        $statistic->setAction($statistic::FASTLY_INSTALLED_FLAG);
+                        $statistic->setSent($sendGAReq);
+                        $statistic->save();
+                    }
+                }
+
+                $fastlyVer = Mage::helper('fastlycdn')->__(Mage::getConfig()->getNode('modules/Fastly_CDN/version'));
+
+                if(isset($fastlyVer)) {
+                    if ($fastlyVer > trim(Mage::getStoreConfig(Fastly_CDN_Helper_Data::XML_FASTLY_MODULE_VERSION))) {
+                        $statistic->sendUpgradeRequest();
+                        Mage::getConfig()->saveConfig(Fastly_CDN_Helper_Data::XML_FASTLY_MODULE_VERSION, $fastlyVer);
+                        Mage::app()->getCacheInstance()->cleanType('config');
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Sends configuration request to GA
+     */
+    public function configurationEvent(Varien_Event_Observer $observer)
+    {
+        if (Mage::helper('core')->isModuleEnabled('Fastly_CDN')) {
+            $statistic = Mage::getModel('fastlycdn/statistic');
+            $isServiceValid = $statistic->isApiKeyValid();
+            $stat = $statistic->getCollection()->getStatByAction($statistic::FASTLY_CONFIGURATION_FLAG);
+
+            if((!$stat->getId()) || !($stat->getState() == true && $isServiceValid == true) ) {
+                $GAreq = $statistic->sendConfigurationRequest($isServiceValid);
+
+                $statistic->setAction($statistic::FASTLY_CONFIGURATION_FLAG);
+                $statistic->setState($isServiceValid);
+                $statistic->setSent($GAreq);
+                $statistic->save();
+            }
+        }
     }
 }

@@ -23,7 +23,7 @@
 <config>
     <modules>
         <Fastly_CDN>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </Fastly_CDN>
     </modules>
     <global>
@@ -34,6 +34,11 @@
             </fastlycdn>
             <fastlycdn_resource_mysql4>
                 <class>Fastly_CDN_Model_Resource_Mysql4</class>
+                <entities>
+                    <statistics>
+                        <table>fastly_statistics</table>
+                    </statistics>
+                </entities>
             </fastlycdn_resource_mysql4>
         </models>
         <helpers>
@@ -88,6 +93,25 @@
                     </fastlycdn_cms>
                 </observers>
             </controller_front_init_routers>
+
+            <!-- send request to GA if the extension is installed for the first time -->
+            <admin_session_user_login_success>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>installedEvent</method>
+                    </fastlycdn>
+                </observers>
+            </admin_session_user_login_success>
+
+            <admin_system_config_changed_section_fastlycdn>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>configurationEvent</method>
+                    </fastlycdn>
+                </observers>
+            </admin_system_config_changed_section_fastlycdn>
         </events>
 
         <!-- list headers that contain real client IP if webserver is behind Fastly. see app/etc/local.xml -->

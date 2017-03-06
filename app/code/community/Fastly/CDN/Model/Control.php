@@ -439,6 +439,7 @@ class Fastly_CDN_Model_Control
 
     /**
      * Fetch Fastly
+     * Fetch Fastly API
      *
      * @param $uri
      * @param string $verb
@@ -498,7 +499,7 @@ class Fastly_CDN_Model_Control
 
             return json_decode($response->getBody());
         } catch (Exception $e) {
-            Mage::helper('fastlycdn')->debug('Purging failed (' . $e->getMessage() . ').');
+            Mage::helper('fastlycdn')->debug('Fetching failed (' . $e->getMessage() . ').');
             return false;
         }
     }
