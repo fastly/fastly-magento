@@ -194,7 +194,7 @@ var Fastly = {
     prepareVersionMessage: function () {
         if(this.dialog != null) {
             var version_label = $(this.divId+'-warning-label');
-            var text = 'You are about to clone your active version '+ this.service.active_version
+            var text = 'You are about to clone **' + this.service.service.name + '** active version '+ this.service.active_version
                 + '. We\'ll upload your VCL to version ' + this.service.next_version + '.';
             version_label.update(text);
         }
