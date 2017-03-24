@@ -52,7 +52,7 @@
         }
     }
 
-    if (http_status_matches(beresp.status, "200,301,404") && !req.http.X-Pass) {
+    if ( beresp.ttl > 0s && (req.request == "GET" || req.request == "HEAD") && !req.http.x-pass ) {
         if (beresp.http.Content-Type ~ "text/(html|xml)") {
             # marker for vcl_deliver to reset Age:
             set beresp.http.magentomarker = "1";
