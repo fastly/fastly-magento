@@ -239,7 +239,7 @@ class Fastly_CDN_Helper_Cache extends Mage_Core_Helper_Abstract
 
         // set "Pragma: no-cache" - just in case
         $response->setHeader('Pragma', 'no-cache', true);
-        $response->setHeader("Fastly-Module-Enabled", "1.0.10", true);
+        $response->setHeader("Fastly-Module-Enabled", "1.0.11", true);
     }
 
     /**

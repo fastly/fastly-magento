@@ -1,6 +1,6 @@
     # Add an easy way to see whether custom Fastly VCL has been uploaded
     if ( req.http.Fastly-Debug ) {
-        set resp.http.Fastly-Magento-VCL-Uploaded = "1.0.10";
+        set resp.http.Fastly-Magento-VCL-Uploaded = "1.0.11";
     } else {
         remove resp.http.Fastly-Module-Enabled;
     }
@@ -28,7 +28,7 @@
         set resp.http.Vary = regsub(resp.http.Vary, "Fastly-Cdn-Env,Https", "Cookie");
     }
 
-    if (resp.http.magentomarker) {
+    if (resp.http.magentomarker && !req.http.Fastly-FF) {
         # Remove the magic marker
         unset resp.http.magentomarker;
 
