@@ -125,7 +125,7 @@ Most of them can be changed on the website and store view levels which allows fi
 configurations for different store frontends.
 
 In your Magento backend go to System -> Configuration -> "Fastly CDN" in the "Services"
-section and open "General Settings" tab.
+section and open "General Settings" tab. On Magento 2.x this will be in Stores -> Configuration.
 
 **Note** that if you change a value here Fastly
 will not reflect it until you purge its HTML objects or the TTL of the cached objects
