@@ -69,27 +69,27 @@
             set req.http.Formkey = req.http.Cookie:FASTLY_CDN_FORMKEY;
         } else {
             # create formkey
-            set req.http.seed = req.http.Cookie client.ip remote.port geoip.longitude geoip.latitude geoip.postal_code;
+            set req.http.seed = req.http.Cookie client.ip remote.port client.geo.longitude client.geo.latitude client.geo.postal_code;
             set req.http.Formkey = regsub(digest.hash_md5(req.http.seed), "^0x", "");
         }
         error 760 req.http.Formkey;
     }
 
-    # geoip lookup
+    # client.geo lookup
     if (req.url ~ "fastlycdn/esi/getcountry/") {
         # check if GeoIP has been already processed by client
         if (req.http.Cookie:FASTLY_CDN_GEOIP_PROCESSED) {
             error 200 "";
         } else {
             # modify req.url and restart request processing
-            error 750 geoip.country_code;
+            error 750 client.geo.country_code;
         }
     }
 
-    # geoip get country code
+    # client.geo get country code
     if (req.url ~ "fastlycdn/esi/getcountrycode/") {
         # create and set req.http.X-Country-Code
-        error 755 geoip.country_code;
+        error 755 client.geo.country_code;
     }
 
     # check for ESI calls
