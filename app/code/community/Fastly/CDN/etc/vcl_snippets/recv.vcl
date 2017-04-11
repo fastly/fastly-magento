@@ -104,8 +104,3 @@
     # we'll strip out query parameters used in Google AdWords, Mailchimp tracking
     set req.http.Magento-Original-URL = req.url;
     set req.url = querystring.regfilter(req.url, "^(utm_.*|gclid|gdftrk|_ga|mc_.*)");
-
-    # If object has been marked as pass pass it
-    if ( req.http.X-Pass ) {
-        return(pass);
-    }
