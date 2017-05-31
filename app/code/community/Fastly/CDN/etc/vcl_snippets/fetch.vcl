@@ -22,7 +22,7 @@
         set beresp.http.Fastly-Restarts = req.restarts;
     }
 
-    if (beresp.http.Content-Type ~ "text/(html|xml)") {
+    if (beresp.http.X-Esi || beresp.http.Content-Type ~ "text/(html|xml)") {
         # enable ESI feature for Magento response by default
         esi;
         if (!beresp.http.Vary ~ "Fastly-Cdn-Env,Https") {
