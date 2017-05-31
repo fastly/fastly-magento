@@ -9,7 +9,7 @@ Once you're ready, go to:
 Magento admin > System > Configuration > General > Web
 ```
 
-Click on the **Secure** tab and enter your Secure Base URL. Also, set **Use Secure URLs in Frontend** and **Use Secure URLs in Admin** options to **Yes**.
+Click on the **Secure** tab and enter your **Secure Base URL**. Also, set **Use Secure URLs in Frontend** and **Use Secure URLs in Admin** options to **Yes**.
 
 ![Secure URL](images/guides/force-tls/secure-url.png "Secure URL")
  
@@ -30,7 +30,7 @@ Under the **General Settings** tab, press the Force TLS button.
 
 ![Force TLS button](images/guides/force-tls/force-tls.png "Force TLS button")
 
-The modal window with the following content will pop up, press the Upload button in the upper right corner:
+The modal window with the following content will pop up, press the **Upload** button in the upper right corner:
 
 ![Force TLS modal](images/guides/force-tls/force-tls-modal.png "Force TLS modal")
 
