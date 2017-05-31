@@ -21,7 +21,7 @@ In order to use the Fastly Cdn extension, you will have to [register a free Fast
 
 Once you register and verify your account, login to Fastly:
 
-![Fastly Wizard](../images/guides/installation/wizard.png "Fastly Wizard")
+![Fastly Wizard](images/guides/installation/wizard.png "Fastly Wizard")
 
 You will see a welcome wizard with two input fields which you should fill with:
 
@@ -30,11 +30,11 @@ You will see a welcome wizard with two input fields which you should fill with:
 
 On the next screen, Fastly is offering you to enable gzip, logging and health check of your origin – you can enable this later. Click continue.
 
-![New Features](../images/guides/installation/newfeatures.png "New Features")
+![New Features](images/guides/installation/newfeatures.png "New Features")
 
 On the final screen, you will have to **point your CNAME to Fastly.** Doing this, you will direct traffic from the Internet through Fastly instead of immediately through your store. You can read more here on how to achieve this.
 
-![Go Live](../images/guides/installation/golive.png "Go Live")
+![Go Live](images/guides/installation/golive.png "Go Live")
 
 Once you’ve finished with pointing your CNAME to Fastly, let’s configure Magento.
 
@@ -45,33 +45,33 @@ System > Configuration > Services > Fastly CDN
 
 Under the **General Settings** tab, set **Enable cache module** to **Yes** and then enter your **Fastly Service ID*** and **Fastly API key****. 
 
-![Choose Fastly](../images/guides/installation/choosefastly.png "Choose Fastly")
+![Choose Fastly](images/guides/installation/choosefastly.png "Choose Fastly")
 
 **To find out you Service ID, login to the Fastly dashboard, locate your **Service name** and click on the **Show Service ID** link.*
 
-![Show Service Id](../images/guides/installation/show-service-id.png "Show Service Id")
+![Show Service Id](images/guides/installation/show-service-id.png "Show Service Id")
 
 ***To find out your API key, while in the Fastly dashboard, select **Account** from the user menu and scroll way down to the bottom of the page. In the **Account API Key** area, click the **Show** button.*
 
-![API key](../images/guides/installation/account-api-key.png "API key")
+![API key](images/guides/installation/account-api-key.png "API key")
 
 You can press the **Test credentials** button just to make sure that you have entered valid credentials.
 
-![Test Credentials](../images/guides/installation/testcredentials.png "Test Credentials")
+![Test Credentials](images/guides/installation/testcredentials.png "Test Credentials")
 
 If you have received a success message, press the **Save Config** button.
 
-![Save config](../images/guides/installation/saveconfig.png "Clear cache")
+![Save config](images/guides/installation/saveconfig.png "Clear cache")
 
 The final step is to upload the **VCL to Fastly.** You can do this by pressing the **Upload VCL to Fastly** button.
 
 The modal window will pop up, make sure that the **Activate VCL after upload** is ticked and press the **Upload** button in the top right corner:
 
-![VCL upload](../images/guides/installation/vclupload.png "VCL upload")
+![VCL upload](images/guides/installation/vclupload.png "VCL upload")
 
 Once the upload process is done, the modal window will automatically close and the success message will show:
 
-![Success VCL](../images/guides/installation/successvcl.png "Success VCL")
+![Success VCL](images/guides/installation/successvcl.png "Success VCL")
 
 That’s it, you have successfully configured your Magento store with the Fastly CDN.
 
