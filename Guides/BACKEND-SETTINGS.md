@@ -28,18 +28,18 @@ You can set three different timeouts:
 You can configure Origin shielding and Backend timeout in the Fastly module by going to:
 
 ```
-Magento admin > Stores > Configuration > Advanced > System > Full Page Cache > Fastly Configuration
+Magento admin > System > Configuration > Services > Fastly CDN
 ```
 
-Under the Fastly Configuration, click on the **Backend settings:**
+Under the Fastly CDN Configuration, click on the **Backend settings:**
 
-![Edit backend](../images/guides/backend-settings/edit-backend.png "Edit backend")
+![Edit backend](images/guides/backend-settings/edit-backend.png "Edit backend")
 
-There you will see a list of backends. Click on the cog icon next to the backend for which you want to configure **Shielding.**
+There you will see a list of backends. Click on the Edit button next to the backend for which you want to configure **Shielding.**
 
 The modal window will pop up with the following content:
 
-![Shield configuration](../images/guides/backend-settings/shielding-configuration.png "Shield configuration")
+![Shield configuration](images/guides/backend-settings/shielding-configuration.png "Shield configuration")
 
 For the Shield value you should select Datacenter close to your backend. As for backend timeout settings, it’s best to leave default values or set them according to your needs. Press the Upload button in the upper right corner to apply your changes.
 
