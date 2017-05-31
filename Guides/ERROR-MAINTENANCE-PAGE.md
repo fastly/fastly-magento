@@ -9,21 +9,21 @@ This guide will show you how to set friendly or prettier 503 custom error page t
  To set custom Error page, go to:
  
 ```
-Magento admin > Stores > Configuration > Advanced > System > Full Page Cache > Fastly Configuration
+Magento admin > System > Configuration > Services > Fastly CDN
 ```
 
 Under the Fastly Configuration, click on the **Error/Maintenance page:**
 
-![Error Maintenance page](../images/guides/error-maintenance-page/error-maintenance-page.png "Error/Maintenance page")
+![Error Maintenance page](images/guides/error-maintenance-page/error-maintenance-page.png "Error/Maintenance page")
 
 The modal window will pop up. Paste your custom HTML code into the HTML textarea and press the Upload button to save changes. 
 
-![Set HTML](../images/guides/error-maintenance-page/set-html.png "Set HTML")
+![Set HTML](images/guides/error-maintenance-page/set-html.png "Set HTML")
 
 Now when Fastly returns 503 error, instead of default error page which looks something like this: 
 
-![Default error page](../images/guides/error-maintenance-page/default-error-page.png "Default error page")
+![Default error page](images/guides/error-maintenance-page/default-error-page.png "Default error page")
 
 You will serve your custom error page:
 
-![New error page](../images/guides/error-maintenance-page/new-error-page.png "New error page")
+![New error page](images/guides/error-maintenance-page/new-error-page.png "New error page")
