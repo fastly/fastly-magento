@@ -11,7 +11,7 @@ We will go with a second approach - manually downloading the zip file.
 3. Go to the Magento backend and open the Cache Management (System -> Cache Management) and refresh the configuration and layout cache.
 3. Due to Magento's permission system, please log out and log in again before continuing with the next step.
 
-If you want to install via composer, you can read step by step instructions [here](../README.md#2-installation).
+If you want to install via composer, you can read step by step instructions [here](../README.md#installation-using-composerjson).
 
 That’s it, you have successfully installed the Fastly CDN extension. Let’s move to configuration.
 
