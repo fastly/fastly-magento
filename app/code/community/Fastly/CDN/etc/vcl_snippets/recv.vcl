@@ -57,7 +57,7 @@
     }
 
     # static files are always cacheable. remove SSL flag and cookie
-    if (req.url ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico)$") {
+    if (req.url ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico|webp|svg)$") {
         unset req.http.Https;
         unset req.http.Cookie;
     }
