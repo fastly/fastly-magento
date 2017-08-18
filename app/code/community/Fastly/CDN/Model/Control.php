@@ -328,6 +328,155 @@ class Fastly_CDN_Model_Control
     }
 
     /**
+     * Creates a new Dictionary.
+     *
+     * @param $version
+     * @param $name
+     * @return bool|mixed
+     */
+    public function createDictionary($version, $name)
+    {
+        $url = $this->_getApiServiceUri(). 'version/' .$version. '/dictionary';
+        $params = array('name' => $name);
+        $verb = \Zend_Http_Client::POST;
+
+        $result = $this->_fetch($url, $verb, $params);
+
+        return $result;
+    }
+
+    /**
+     * Remove Dictionary.
+     *
+     * @param $version
+     * @param $name
+     * @return bool|mixed
+     */
+    public function deleteDictionary($version, $name)
+    {
+        $url = $this->_getApiServiceUri(). 'version/' .$version. '/dictionary/' . $name;
+        $verb = \Zend_Http_Client::DELETE;
+
+        $result = $this->_fetch($url, $verb);
+
+        return $result;
+    }
+
+    /**
+     * Gets the specified Dictionary object.
+     *
+     * @param $version
+     * @param $name
+     * @return bool|mixed
+     */
+    public function getDictionary($version, $name)
+    {
+        $url = $this->_getApiServiceUri(). 'version/'. $version. '/dictionary/' . $name;
+        $result = $this->_fetch($url, \Zend_Http_Client::GET);
+
+        return $result;
+    }
+
+    /**
+     * Gets the all Dictionaries.
+     *
+     * @param $version
+     * @return bool|mixed
+     */
+    public function getDictionaries($version)
+    {
+        $url = $this->_getApiServiceUri(). 'version/'. $version. '/dictionary';
+        $result = $this->_fetch($url, \Zend_Http_Client::GET);
+
+        return $result;
+    }
+
+    /**
+     * Get All Dictionary Items.
+     *
+     * @param $id
+     * @return bool|mixed
+     */
+    public function getDictionaryItems($id)
+    {
+        $url = $this->_getApiServiceUri(). 'dictionary/' . $id . '/items';
+        $verb = \Zend_Http_Client::GET;
+
+        $result = $this->_fetch($url, $verb);
+
+        return $result;
+    }
+
+    /**
+     * Get Single Dictionary Item.
+     *
+     * @param $id
+     * @param $key
+     * @return bool|mixed
+     */
+    public function getDictionaryItem($id, $key)
+    {
+        $url = $this->_getApiServiceUri(). 'dictionary/' . $id . '/item/' . $key;
+        $verb = \Zend_Http_Client::GET;
+
+        $result = $this->_fetch($url, $verb);
+
+        return $result;
+    }
+
+    /**
+     * Add Dictionary Item.
+     *
+     * @param $id
+     * @param $params
+     * @return bool|mixed
+     */
+    public function addDictionaryItem($id, $params)
+    {
+        $checkIfExists = $this->getDictionaryItem($id, $params['item_key']);
+        $url = $this->_getApiServiceUri(). 'dictionary/' . $id . '/item';
+
+        if(!$checkIfExists)
+        {
+            $verb = \Zend_Http_Client::POST;
+
+            $params = array(
+                'item_key' => $params['item_key'],
+                'item_value' => $params['item_value']
+            );
+
+        } else {
+            $verb = \Zend_Http_Client::PUT;
+            $url .= '/'.$params['item_key'];
+
+            $params = array(
+                'item_value' => $params['item_value']
+            );
+        }
+
+        $result = $this->_fetch($url, $verb, $params);
+
+        return $result;
+    }
+
+    /**
+     * Remove Dictionary Item.
+     *
+     * @param $id
+     * @param $key
+     * @return bool|mixed
+     */
+    public function removeDictionaryItem($id, $key)
+    {
+        $url = $this->_getApiServiceUri(). 'dictionary/' . $id . '/item/' . $key;
+        $verb = \Zend_Http_Client::DELETE;
+
+        $result = $this->_fetch($url, $verb);
+
+        return $result;
+    }
+
+    /**
      * Gets the specified Request Settings object.
      *
      * @param $version
@@ -502,5 +651,154 @@ class Fastly_CDN_Model_Control
             Mage::helper('fastlycdn')->debug('Fetching failed (' . $e->getMessage() . ').');
             return false;
         }
+    }
+
+    /**
+     * Creates a new Acl.
+     *
+     * @param $version
+     * @param $name
+     * @return bool|mixed
+     */
+    public function createAcl($version, $name)
+    {
+        $url = $this->_getApiServiceUri(). 'version/' .$version. '/acl';
+        $params = array('name' => $name);
+        $verb = \Zend_Http_Client::POST;
+
+        $result = $this->_fetch($url, $verb, $params);
+
+        return $result;
+    }
+
+    /**
+     * Remove Acl.
+     *
+     * @param $version
+     * @param $name
+     * @return bool|mixed
+     */
+    public function deleteAcl($version, $name)
+    {
+        $url = $this->_getApiServiceUri(). 'version/' .$version. '/acl/' . $name;
+        $verb = \Zend_Http_Client::DELETE;
+
+        $result = $this->_fetch($url, $verb);
+
+        return $result;
+    }
+
+    /**
+     * Gets the specified Acl object.
+     *
+     * @param $version
+     * @param $name
+     * @return bool|mixed
+     */
+    public function getAcl($version, $name)
+    {
+        $url = $this->_getApiServiceUri(). 'version/'. $version. '/acl/' . $name;
+        $result = $this->_fetch($url, \Zend_Http_Client::GET);
+
+        return $result;
+    }
+
+    /**
+     * Gets the all Acls.
+     *
+     * @param $version
+     * @return bool|mixed
+     */
+    public function getAcls($version)
+    {
+        $url = $this->_getApiServiceUri(). 'version/'. $version. '/acl';
+        $result = $this->_fetch($url, \Zend_Http_Client::GET);
+
+        return $result;
+    }
+
+    /**
+     * Get All Acl Items.
+     *
+     * @param $id
+     * @return bool|mixed
+     */
+    public function getAclItems($id)
+    {
+        $url = $this->_getApiServiceUri(). 'acl/' . $id . '/entries';
+        $verb = \Zend_Http_Client::GET;
+
+        $result = $this->_fetch($url, $verb);
+
+        return $result;
+    }
+
+    /**
+     * Add Acl Item.
+     *
+     * @param $aclId
+     * @param $itemValue
+     * @param $aclItemId
+     * @param $negated
+     * @param $subnet
+     * @return bool|mixed
+     */
+    public function addAclItem($aclId, $aclItemId, $itemValue, $negated, $subnet = false)
+    {
+        $checkIfExists = $aclItemId === 'false' ? false : $this->getAclItem($aclId, $aclItemId);
+        $url = $this->_getApiServiceUri(). 'acl/' . $aclId . '/entry';
+
+        $negated = $negated === 'true';
+
+        if($subnet) {
+            $params = array('ip' => $itemValue, 'negated' => $negated, 'comment' => 'Added by Magento Module', 'subnet' => $subnet);
+        } else {
+            $params = array('ip' => $itemValue, 'negated' => $negated, 'comment' => 'Added by Magento Module');
+        }
+
+        if(!$checkIfExists) {
+            $verb = \Zend_Http_Client::POST;
+        } else {
+            $verb = \Zend_Http_Client::PATCH;
+            $url .= '/'.$aclItemId;
+        }
+
+        $result = $this->_fetch($url, $verb, $params);
+
+        return $result;
+    }
+
+    /**
+     * Get Single Acl Item.
+     *
+     * @param $id
+     * @param $entryId
+     * @return bool|mixed
+     */
+    public function getAclItem($id, $entryId)
+    {
+        $url = $this->_getApiServiceUri(). 'acl/' . $id . '/entry/' . $entryId;
+        $verb = \Zend_Http_Client::GET;
+
+        $result = $this->_fetch($url, $verb);
+
+        return $result;
+    }
+
+    /**
+     * Remove Acl Item.
+     *
+     * @param $id
+     * @param $entryId
+     * @return bool|mixed
+     */
+    public function removeAclItem($id, $entryId)
+    {
+        $url = $this->_getApiServiceUri(). 'acl/' . $id . '/entry/' . $entryId;
+        $verb = \Zend_Http_Client::DELETE;
+
+        $result = $this->_fetch($url, $verb);
+
+        return $result;
     }
 }
