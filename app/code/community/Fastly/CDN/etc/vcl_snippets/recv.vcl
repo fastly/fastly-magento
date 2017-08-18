@@ -9,8 +9,15 @@
 
     # bypass language switcher
     if (req.url ~ "(?i)___from_store=.*&___store=.*") {
-        set req.http.X-Pass = "1";
+        set req.http.x-pass = "1";
+    # Pass any checkout or cart urls
+    } else if ( if (req.url ~ "/(cart|checkout)") {
+        set req.http.x-pass = "1";
+    # Pass all admin actions
+    } else if ( req.url ~ "^/(index\.php/)?admin(_.*)?/" ) {
+        set req.http.x-pass = "1";
     }
+
 
     # set HTTPS header for offloaded TLS
     if (req.http.Fastly-SSL) {
