@@ -26,7 +26,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
      */
     protected $_statistic;
 
-    
+
     const FORCE_TLS_SETTING_NAME = 'magentomodule_force_tls';
     /**
      * VCL error snippet path
@@ -134,6 +134,8 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
                 if (!in_array($host, explode('|', $domainList))) {
                     throw new Mage_Core_Exception(Mage::helper('fastlycdn')->__('Invalid domain "%s".', $host));
                 }
+
+                $scheme = Mage::app()->getStore()->isCurrentlySecure() ? 'https' : 'http';
 
                 // build uri to purge
                 $uri = $scheme . '://'
@@ -255,7 +257,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
         try {
             $this->getResponse()->setHeader('Content-type', 'application/json');
             $control = Mage::getModel('fastlycdn/control');
-            
+
             $activeVersion = $this->getRequest()->getParam('active_version');
             $activateVcl = $this->getRequest()->getParam('activate_flag');
             $service = $control->checkServiceDetails();
@@ -328,6 +330,261 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             }
 
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'active_version' => $clone->number));
+            return $this->getResponse()->setBody($jsonData);
+
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Clones and activates new version (Dictionary)
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function createDictionaryAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $activeVersion = $this->getRequest()->getParam('active_version');
+            $activateVcl = $this->getRequest()->getParam('activate_flag');
+            $dictionaryName = $this->getRequest()->getParam('dictionary_name');
+            $service = $control->checkServiceDetails();
+
+            if(!$service) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to check Service details.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $currActiveVersion = Mage::helper('fastlycdn')->determineVersions($service->versions);
+
+            if($currActiveVersion['active_version'] != $activeVersion) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Active versions mismatch.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $clone = $control->cloneVersion($currActiveVersion['active_version']);
+
+            if(!$clone) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to clone active version.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $status = $control->createDictionary($clone->number, $dictionaryName);
+
+            if(!$status) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to create Dictionary.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $validate = $control->validateServiceVersion($clone->number);
+
+            if($validate->status == 'error') {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to validate service version: '.$validate->msg));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if($activateVcl === 'true') {
+                $control->activateVersion($clone->number);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(
+                array(
+                    'status' => true,
+                    'active_version' => $clone->number,
+                    'dictionary_name' => $status->name,
+                    'dictionary_id' => $status->id
+                ));
+            return $this->getResponse()->setBody($jsonData);
+
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Clones and activates new version (Dictionary)
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function deleteDictionaryAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $activeVersion = $this->getRequest()->getParam('active_version');
+            $activateVcl = $this->getRequest()->getParam('activate_flag');
+            $dictionaryName = $this->getRequest()->getParam('dictionary_name');
+            $service = $control->checkServiceDetails();
+
+            if(!$service) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to check Service details.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $currActiveVersion = Mage::helper('fastlycdn')->determineVersions($service->versions);
+
+            if($currActiveVersion['active_version'] != $activeVersion) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Active versions mismatch.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $clone = $control->cloneVersion($currActiveVersion['active_version']);
+
+            if(!$clone) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to clone active version.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $status = $control->deleteDictionary($clone->number, $dictionaryName);
+
+            if(!$status) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to remove Dictionary.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $validate = $control->validateServiceVersion($clone->number);
+
+            if($validate->status == 'error') {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to validate service version: '.$validate->msg));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if($activateVcl === 'true') {
+                $control->activateVersion($clone->number);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'active_version' => $clone->number));
+            return $this->getResponse()->setBody($jsonData);
+
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Fetches dictionary items
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function listDictionaryItemsAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $dictionaryId = $this->getRequest()->getParam('dictionary_id');
+
+            if(!$dictionaryId) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Missing dictionary name.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $items = $control->getDictionaryItems($dictionaryId);
+
+            if(is_array($items) && empty($items)) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => 'empty', 'msg' => 'This dictionary has no items.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if(!$items) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to fetch Dictionary items.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'items' => $items));
+            return $this->getResponse()->setBody($jsonData);
+
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Add dictionary item
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function addDictionaryItemAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $dictionaryId = $this->getRequest()->getParam('dictionary_id');
+            $key = $this->getRequest()->getParam('item_key');
+            $value = $this->getRequest()->getParam('item_value');
+
+            if(!$key || !$value) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Missing Dictionary item data.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if(!$dictionaryId) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Missing Dictionary name.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $params = array(
+                'item_key' => $key,
+                'item_value' => $value
+            );
+
+            $item = $control->addDictionaryItem($dictionaryId, $params);
+
+            if(!$item) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to add Dictionary item.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'item' => $item));
+            return $this->getResponse()->setBody($jsonData);
+
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Remove dictionary item
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function removeDictionaryItemAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $dictionaryId = $this->getRequest()->getParam('dictionary_id');
+            $key = $this->getRequest()->getParam('item_key');
+
+            if(!$key) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Missing Dictionary item data.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if(!$dictionaryId) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Missing Dictionary name.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $status = $control->removeDictionaryItem($dictionaryId, $key);
+
+            if(!$status) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to remove Dictionary item.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true));
             return $this->getResponse()->setBody($jsonData);
 
         } catch (\Exception $e) {
@@ -625,6 +882,275 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
 
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'active_version' => $clone->number, 'backends' => $configureBackend));
             return $this->getResponse()->setBody($jsonData);
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Clones and activates new version (ACL)
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function createAclAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $activeVersion = $this->getRequest()->getParam('active_version');
+            $activateVcl = $this->getRequest()->getParam('activate_flag');
+            $aclName = $this->getRequest()->getParam('acl_name');
+            $service = $control->checkServiceDetails();
+
+            if(!$service) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to check Service details.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $currActiveVersion = Mage::helper('fastlycdn')->determineVersions($service->versions);
+
+            if($currActiveVersion['active_version'] != $activeVersion) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Active versions mismatch.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $clone = $control->cloneVersion($currActiveVersion['active_version']);
+
+            if(!$clone) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to clone active version.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $status = $control->createAcl($clone->number, $aclName);
+
+            if(!$status) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to create Acl.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $validate = $control->validateServiceVersion($clone->number);
+
+            if($validate->status == 'error') {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to validate service version: '.$validate->msg));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if($activateVcl === 'true') {
+                $control->activateVersion($clone->number);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(
+                array(
+                    'status' => true,
+                    'active_version' => $clone->number,
+                    'acl_name' => $status->name,
+                    'acl_id' => $status->id)
+            );
+            return $this->getResponse()->setBody($jsonData);
+
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Clones and activates new version (ACL)
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function deleteAclAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $activeVersion = $this->getRequest()->getParam('active_version');
+            $activateVcl = $this->getRequest()->getParam('activate_flag');
+            $aclName = $this->getRequest()->getParam('acl_name');
+            $service = $control->checkServiceDetails();
+
+            if(!$service) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to check Service details.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $currActiveVersion = Mage::helper('fastlycdn')->determineVersions($service->versions);
+
+            if($currActiveVersion['active_version'] != $activeVersion) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Active versions mismatch.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $clone = $control->cloneVersion($currActiveVersion['active_version']);
+
+            if(!$clone) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to clone active version.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $status = $control->deleteAcl($clone->number, $aclName);
+
+            if(!$status) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to remove Acl.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $validate = $control->validateServiceVersion($clone->number);
+
+            if($validate->status == 'error') {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to validate service version: '.$validate->msg));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if($activateVcl === 'true') {
+                $control->activateVersion($clone->number);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'active_version' => $clone->number));
+            return $this->getResponse()->setBody($jsonData);
+
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Fetches Acl items
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function listAclItemsAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $aclId = $this->getRequest()->getParam('acl_id');
+
+            if(!$aclId) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Missing acl name.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $items = $control->getAclItems($aclId);
+
+            if(is_array($items) && empty($items)) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => 'empty', 'msg' => 'This Acl has no items.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if(!$items) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to fetch Acl items.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'items' => $items));
+            return $this->getResponse()->setBody($jsonData);
+
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Add Acl item
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function addAclItemAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $aclId = $this->getRequest()->getParam('acl_id');
+            $aclItemId = $this->getRequest()->getParam('acl_item_id');
+            $ip = $this->getRequest()->getParam('ip');
+            $negated = $this->getRequest()->getParam('negated');
+
+
+            if(!$ip || !$negated) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Missing Acl item data.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if(!$aclId) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Missing Acl name.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            // Handle subnet
+            $ipParts = explode('/', $ip);
+            $subnet = false;
+            if(!empty($ipParts[1])) {
+                if(is_numeric($ipParts[1]) && (int)$ipParts[1] < 129) {
+                    $subnet = $ipParts[1];
+                } else {
+                    $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Invalid IP subnet format.'));
+                    return $this->getResponse()->setBody($jsonData);
+                }
+            }
+
+            if (!filter_var($ipParts[0], FILTER_VALIDATE_IP)) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Invalid IP address format.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $item = $control->addAclItem($aclId, $aclItemId, $ipParts[0], $negated, $subnet);
+
+            if(!$item) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to add Acl item.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'item' => $item));
+            return $this->getResponse()->setBody($jsonData);
+
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Remove Acl item
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function removeAclItemAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $aclId = $this->getRequest()->getParam('acl_id');
+            $aclItemId = $this->getRequest()->getParam('acl_item_id');
+
+            if(!$aclItemId) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Missing Acl item data.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if(!$aclId) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Missing Acl container ID.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $status = $control->removeAclItem($aclId, $aclItemId);
+
+            if(!$status) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to remove Acl item.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true));
+            return $this->getResponse()->setBody($jsonData);
+
         } catch (\Exception $e) {
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
             return $this->getResponse()->setBody($jsonData);

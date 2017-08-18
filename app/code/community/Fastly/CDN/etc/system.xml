@@ -356,12 +356,46 @@
                         </backends>
                     </fields>
                 </backend_settings>
+                <dictonaries translate="label comment" module="fastlycdn">
+                    <label>Dictionaries Settings</label>
+                    <show_in_default>1</show_in_default>
+                    <sort_order>50</sort_order>
+                    <fields>
+                        <dictionary_list translate="label comment">
+                            <label>Dictionary list</label>
+                            <frontend_type>textarea</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_dictionariesMap</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </dictionary_list>
+                    </fields>
+                </dictonaries>
+                <edge_acl translate="label comment" module="fastlycdn">
+                    <label>Edge Acl Settings</label>
+                    <show_in_default>1</show_in_default>
+                    <sort_order>60</sort_order>
+                    <fields>
+                        <acl_list translate="label comment">
+                            <label>Acl list</label>
+                            <frontend_type>textarea</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_aclsMap</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </acl_list>
+                    </fields>
+                </edge_acl>
                 <error_maintenance_page translate="label comment" module="fastlycdn">
                     <label>Error/Maintenance page</label>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
-                    <sort_order>50</sort_order>
+                    <sort_order>70</sort_order>
                     <fields>
                         <error_maintenance translate="label comment">
                             <label>Error Page HTML</label>

@@ -181,9 +181,206 @@
             </table>
         </form>
     </div>
+
+    <!-- Create Dictionary Form -->
+
+    <div id="dictionary-create-form">
+        <div class="content-header">
+            <p class="form-buttons"><button id="dictionary-delete-form-cancel" title="Cancel" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()"><span><span><span>Back</span></span></span></button><button id="dictionary-create-form-upload" title="Upload" type="button" class="scalable save" onclick="Fastly.createDictionary(); return false;"><span><span><span>Create</span></span></span></button></p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg" id="dictionary-create-form-warning-dialog-box"><ul><li><span id="dictionary-create-form-warning-label"></span></li></ul></li>
+                <li class="error-msg" id="dictionary-create-form-error-dialog-box" style="display:none;"><ul><li><span id="dictionary-create-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <table class="form-list" cellspacing="0">
+                <tbody>
+
+                <tr>
+                    <td class="label"><label for="dictionary-create-form-name">Dictionary name</label></td>
+                    <td class="value">
+                        <input name="dictionary-create-form-name" class="input-text required-entry validate-code" id="dictionary-create-form-name">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label"><label for="dictionary-create-form-activate">Activate VCL after upload</label></td>
+                    <td class="value">
+                        <input id="dictionary-create-form-activate" name="dictionary-create-form-activate" value="1" checked="checked" type="checkbox">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <!-- Remove Dictionary Form -->
+
+    <div id="dictionary-remove-form">
+        <div class="content-header">
+            <p class="form-buttons"><button id="dictionary-remove-form-cancel" title="Cancel" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()"><span><span><span>Back</span></span></span></button><button id="dictionary-remove-form-upload" title="Upload" type="button" class="scalable save" onclick="Fastly.removeDictionary(); return false;"><span><span><span>Remove</span></span></span></button></p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg" id="dictionary-remove-form-warning-dialog-box"><ul><li><span id="dictionary-remove-form-warning-label"></span></li></ul></li>
+                <li class="error-msg" id="dictionary-remove-form-error-dialog-box" style="display:none;"><ul><li><span id="dictionary-remove-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <table class="form-list" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td class="label"><label for="dictionary-remove-form-activate">Activate after dictionary removal</label></td>
+                        <td class="value">
+                            <input id="dictionary-remove-form-activate" name="dictionary-remove-form-activate" value="1" checked="checked" type="checkbox">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <!-- List Dictionary Form -->
+
+    <div id="dictionary-list-form">
+        <div class="content-header">
+            <p class="form-buttons">
+                <button id="dictionary-list-form-cancel" title="Back" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()">
+                    <span><span><span>Back</span></span></span>
+                </button>
+            </p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="error-msg" id="dictionary-list-form-error-dialog-box" style="display:none;"><ul><li><span id="dictionary-list-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <div class="grid">
+                <table class="border" cellspacing="0">
+                    <tbody id="dictionary-item-body">
+                    <tr class="headings">
+                        <th>Item key</th>
+                        <th>Item value</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    </tbody>
+                </table>
+                <button type="button" title="Add item" class="scalable add" onclick="Fastly.addDictionaryItemHtml(false, false)"><span><span><span>Add item</span></span></span></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Create Acl Form -->
+
+    <div id="acl-create-form">
+        <div class="content-header">
+            <p class="form-buttons"><button id="acl-delete-form-cancel" title="Cancel" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()"><span><span><span>Back</span></span></span></button><button id="acl-create-form-upload" title="Upload" type="button" class="scalable save" onclick="Fastly.createAcl(); return false;"><span><span><span>Create</span></span></span></button></p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg" id="acl-create-form-warning-dialog-box"><ul><li><span id="acl-create-form-warning-label"></span></li></ul></li>
+                <li class="error-msg" id="acl-create-form-error-dialog-box" style="display:none;"><ul><li><span id="acl-create-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <table class="form-list" cellspacing="0">
+                <tbody>
+
+                <tr>
+                    <td class="label"><label for="acl-create-form-name">Acl name</label></td>
+                    <td class="value">
+                        <input name="acl-create-form-name" class="input-text required-entry validate-code" id="acl-create-form-name">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label"><label for="acl-create-form-activate">Activate VCL after upload</label></td>
+                    <td class="value">
+                        <input id="acl-create-form-activate" name="acl-create-form-activate" value="1" checked="checked" type="checkbox">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <!-- Remove Acl Form -->
+
+    <div id="acl-remove-form">
+        <div class="content-header">
+            <p class="form-buttons"><button id="acl-remove-form-cancel" title="Cancel" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()"><span><span><span>Back</span></span></span></button><button id="acl-remove-form-upload" title="Upload" type="button" class="scalable save" onclick="Fastly.removeAcl(); return false;"><span><span><span>Remove</span></span></span></button></p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg" id="acl-remove-form-warning-dialog-box"><ul><li><span id="acl-remove-form-warning-label"></span></li></ul></li>
+                <li class="error-msg" id="acl-remove-form-error-dialog-box" style="display:none;"><ul><li><span id="acl-remove-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <table class="form-list" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td class="label"><label for="acl-remove-form-activate">Activate after acl removal</label></td>
+                    <td class="value">
+                        <input id="acl-remove-form-activate" name="acl-remove-form-activate" value="1" checked="checked" type="checkbox">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <!-- List Acl Form -->
+
+    <div id="acl-list-form">
+        <div class="content-header">
+            <p class="form-buttons">
+                <button id="acl-list-form-cancel" title="Back" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()">
+                    <span><span><span>Back</span></span></span>
+                </button>
+            </p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="error-msg" id="acl-list-form-error-dialog-box" style="display:none;"><ul><li><span id="acl-list-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <div class="grid">
+                <table class="border" cellspacing="0">
+                    <tbody id="acl-item-body">
+                    <tr class="headings">
+                        <th>IP Value</th>
+                        <th>Negated</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    </tbody>
+                </table>
+                <button type="button" title="Add item" class="scalable add" onclick="Fastly.addAclItemHtml(false, false)"><span><span><span>Add item</span></span></span></button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
+    // Dictionary urls
+    var create_dictionary_url = '<?php echo $this->getUrl('*/fastlyCdn/createDictionary');?>';
+    var delete_dictionary_url = '<?php echo $this->getUrl('*/fastlyCdn/deleteDictionary');?>';
+    var list_dictionary_items_url = '<?php echo $this->getUrl('*/fastlyCdn/listDictionaryItems');?>';
+    var add_dictionary_item_url = '<?php echo $this->getUrl('*/fastlyCdn/addDictionaryItem');?>';
+    var remove_dictionary_item_url = '<?php echo $this->getUrl('*/fastlyCdn/removeDictionaryItem');?>';
+    // Acl urls
+    var create_acl_url = '<?php echo $this->getUrl('*/fastlyCdn/createAcl');?>';
+    var delete_acl_url = '<?php echo $this->getUrl('*/fastlyCdn/deleteAcl');?>';
+    var list_acl_items_url = '<?php echo $this->getUrl('*/fastlyCdn/listAclItems');?>';
+    var add_acl_item_url = '<?php echo $this->getUrl('*/fastlyCdn/addAclItem');?>';
+    var remove_acl_item_url = '<?php echo $this->getUrl('*/fastlyCdn/removeAclItem');?>';
+    // Fastly data
     var check_service_url = '<?php echo $this->getUrl('*/fastlyCdn/checkServiceDetails');?>';
     var upload_snippets_url = '<?php echo $this->getUrl('*/fastlyCdn/uploadVclSnippets');?>';
     var is_enabled = '<?php echo Mage::helper('fastlycdn')->isEnabled() ?>';
