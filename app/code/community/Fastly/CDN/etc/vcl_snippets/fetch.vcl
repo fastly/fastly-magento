@@ -18,10 +18,6 @@
 
     }
 
-    if (req.restarts > 0 ) {
-        set beresp.http.Fastly-Restarts = req.restarts;
-    }
-
     if (beresp.http.X-Esi || beresp.http.Content-Type ~ "text/(html|xml)") {
         # enable ESI feature for Magento response by default
         esi;
@@ -75,13 +71,9 @@
             set beresp.http.Surrogate-Key = "text";
         }
 
-        # set surrogate keys by content type
-        if (beresp.http.Content-Type ~ "image") {
-            set beresp.http.Surrogate-Key = "image";
-        } elsif (beresp.http.Content-Type ~ "script") {
-            set beresp.http.Surrogate-Key = "script";
-        } elsif (beresp.http.Content-Type ~ "css") {
-            set beresp.http.Surrogate-Key = "css";
+        # set surrogate keys by content type if they are image/script or CSS
+        if (beresp.http.Content-Type ~ "(image|script|css)") {
+            set beresp.http.Surrogate-Key = re.group.1;
         }
 
     }

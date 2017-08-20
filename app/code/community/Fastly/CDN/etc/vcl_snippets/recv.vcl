@@ -4,20 +4,20 @@
         set req.url = re.group.2;
     }
 
-    # Sort the query arguments
+    # Sort the query arguments to increase cache hit ratio with query arguments that
+    # may be out od order
     set req.url = boltsort.sort(req.url);
 
-    # bypass language switcher
-    if (req.url ~ "(?i)___from_store=.*&___store=.*") {
-        set req.http.x-pass = "1";
-    # Pass any checkout or cart urls
-    } else if ( if (req.url ~ "/(cart|checkout)") {
+    # Pass any checkout, cart or customer/myaccount urls
+    if (req.url ~ "/(cart|checkout|customer)") {
         set req.http.x-pass = "1";
     # Pass all admin actions
-    } else if ( req.url ~ "^/(index\.php/)?admin(_.*)?/" ) {
+    } else if (req.url ~ "^/(index\.php/)?admin(_.*)?/") {
+        set req.http.x-pass = "1";
+    # bypass language switcher
+    } else if (req.url ~ "(?i)___from_store=.*&___store=.*") {
         set req.http.x-pass = "1";
     }
-
 
     # set HTTPS header for offloaded TLS
     if (req.http.Fastly-SSL) {
@@ -64,7 +64,7 @@
     }
 
     # static files are always cacheable. remove SSL flag and cookie
-    if (req.url ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico|webp|svg)$") {
+    if (req.url.path ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico|webp|svg)$") {
         unset req.http.Https;
         unset req.http.Cookie;
     }
