@@ -48,20 +48,21 @@
         }
     }
 
+    # Force any responses with private, no-cache or no-store in Cache-Control to pass
+    if (beresp.http.Cache-Control ~ "private|no-cache|no-store") {
+        set req.http.Fastly-Cachetype = "PRIVATE";
+        return (pass);
+    }
+
+    # If origin provides TTL for an object we cache it
     if ( beresp.ttl > 0s && (req.request == "GET" || req.request == "HEAD") && !req.http.x-pass ) {
         if (beresp.http.Content-Type ~ "text/(html|xml)") {
             # marker for vcl_deliver to reset Age:
             set beresp.http.magentomarker = "1";
 
-            # Don't cache cookies
+            # Don't cache cookies - this is here because Magento sets cookies even for anonymous users
+            # which busts cache
             unset beresp.http.set-cookie;
-        } else {
-            if (beresp.http.Expires || beresp.http.Surrogate-Control ~ "max-age" || beresp.http.Cache-Control ~ "(s-maxage|max-age)") {
-                # keep the ttl here
-            } else {
-                # apply the default ttl
-                set beresp.ttl = 3600s;
-            }
         }
 
         # init surrogate keys

@@ -3,6 +3,12 @@
         set resp.http.Fastly-Magento-VCL-Uploaded = "1.0.15";
     } else {
         remove resp.http.Fastly-Module-Enabled;
+        # remove Varnish/proxy header
+        remove resp.http.X-Varnish;
+        remove resp.http.Via;
+        remove resp.http.Age;
+        remove resp.http.X-Purge-URL;
+        remove resp.http.X-Purge-Host;
     }
 
     # debug info
@@ -15,12 +21,6 @@
         }
         set resp.http.X-Cache-Expires  = resp.http.Expires;
     } else {
-        # remove Varnish/proxy header
-        remove resp.http.X-Varnish;
-        remove resp.http.Via;
-        remove resp.http.Age;
-        remove resp.http.X-Purge-URL;
-        remove resp.http.X-Purge-Host;
     }
 
     # Clean up Vary before handing off to the user

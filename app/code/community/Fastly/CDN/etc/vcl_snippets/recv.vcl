@@ -4,10 +4,6 @@
         set req.url = re.group.2;
     }
 
-    # Sort the query arguments to increase cache hit ratio with query arguments that
-    # may be out od order
-    set req.url = boltsort.sort(req.url);
-
     # Pass any checkout, cart or customer/myaccount urls
     if (req.url ~ "/(cart|checkout|customer)") {
         set req.http.x-pass = "1";
@@ -111,3 +107,8 @@
     # we'll strip out query parameters used in Google AdWords, Mailchimp tracking
     set req.http.Magento-Original-URL = req.url;
     set req.url = querystring.regfilter(req.url, "^(utm_.*|gclid|gdftrk|_ga|mc_.*)");
+    # Sort the query arguments to increase cache hit ratio with query arguments that
+    # may be out of order however only on URLs that are not being passed. 
+    if ( !req.http.x-pass ) {
+        set req.url = boltsort.sort(req.url);
+    }
