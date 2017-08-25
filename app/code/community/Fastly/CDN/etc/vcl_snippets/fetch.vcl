@@ -66,13 +66,13 @@
 
     # If origin provides TTL for an object we cache it
     if ( beresp.ttl > 0s && (req.request == "GET" || req.request == "HEAD") && !req.http.x-pass ) {
+        # Don't cache cookies - this is here because Magento sets cookies even for anonymous users
+        # which busts cache
+        unset beresp.http.set-cookie;
+
         if (beresp.http.Content-Type ~ "^text/(html|xml)") {
             # marker for vcl_deliver to reset Age:
             set beresp.http.magentomarker = "1";
-
-            # Don't cache cookies - this is here because Magento sets cookies even for anonymous users
-            # which busts cache
-            unset beresp.http.set-cookie;
 
             # init surrogate keys
             if (beresp.http.Surrogate-Key) {
