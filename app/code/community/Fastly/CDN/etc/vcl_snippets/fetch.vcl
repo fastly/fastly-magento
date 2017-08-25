@@ -14,11 +14,11 @@
         }
 
         /* else go to vcl_error to deliver a synthetic */
-        error 503;
+        error beresp.status beresp.response;
 
     }
 
-    if (beresp.http.X-Esi || beresp.http.Content-Type ~ "text/(html|xml)") {
+    if (beresp.http.X-Esi || beresp.http.Content-Type ~ "^text/(html|xml)") {
         # enable ESI feature for Magento response by default
         esi;
         if (!beresp.http.Vary ~ "Fastly-Cdn-Env,Https") {
@@ -54,27 +54,38 @@
         return (pass);
     }
 
+    # Just in case the Request Setting for x-pass is missing
+    if (req.http.x-pass) {
+        return (pass);
+    }
+
+    # Varnish sets default TTL if none of these are present
+    if (!beresp.http.Expires && !beresp.http.Surrogate-Control ~ "max-age" && !beresp.http.Cache-Control ~ "(s-maxage|max-age)") {
+        set beresp.ttl = 0s;
+    }
+
     # If origin provides TTL for an object we cache it
     if ( beresp.ttl > 0s && (req.request == "GET" || req.request == "HEAD") && !req.http.x-pass ) {
-        if (beresp.http.Content-Type ~ "text/(html|xml)") {
+        if (beresp.http.Content-Type ~ "^text/(html|xml)") {
             # marker for vcl_deliver to reset Age:
             set beresp.http.magentomarker = "1";
 
             # Don't cache cookies - this is here because Magento sets cookies even for anonymous users
             # which busts cache
             unset beresp.http.set-cookie;
-        }
 
-        # init surrogate keys
-        if (beresp.http.Surrogate-Key) {
-            set beresp.http.Surrogate-Key = beresp.http.Surrogate-Key " text";
-        } else {
-            set beresp.http.Surrogate-Key = "text";
+            # init surrogate keys
+            if (beresp.http.Surrogate-Key) {
+                set beresp.http.Surrogate-Key = beresp.http.Surrogate-Key " text";
+            } else {
+                set beresp.http.Surrogate-Key = "text";
+            }
+        } else if (beresp.http.Content-Type ~ "(image|script|css)") {
+            # set surrogate keys by content type if they are image/script or CSS
+            if (beresp.http.Surrogate-Key) {
+                set beresp.http.Surrogate-Key = beresp.http.Surrogate-Key " " re.group.1;
+            } else {
+                set beresp.http.Surrogate-Key = re.group.1;
+            }
         }
-
-        # set surrogate keys by content type if they are image/script or CSS
-        if (beresp.http.Content-Type ~ "(image|script|css)") {
-            set beresp.http.Surrogate-Key = re.group.1;
-        }
-
     }
