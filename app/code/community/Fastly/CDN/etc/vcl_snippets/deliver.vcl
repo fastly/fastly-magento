@@ -6,21 +6,8 @@
         # remove Varnish/proxy header
         remove resp.http.X-Varnish;
         remove resp.http.Via;
-        remove resp.http.Age;
         remove resp.http.X-Purge-URL;
         remove resp.http.X-Purge-Host;
-    }
-
-    # debug info
-    if (resp.http.X-Cache-Debug) {
-        if (obj.hits > 0) {
-            set resp.http.X-Cache      = "HIT";
-            set resp.http.X-Cache-Hits = obj.hits;
-        } else {
-            set resp.http.X-Cache      = "MISS";
-        }
-        set resp.http.X-Cache-Expires  = resp.http.Expires;
-    } else {
     }
 
     # Clean up Vary before handing off to the user
