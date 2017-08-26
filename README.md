@@ -114,11 +114,11 @@ System > Configuration > Services > Fastly CDN
 
 Under the **General Settings** tab, set **Enable cache module** to **Yes** and then enter your **Fastly Service ID*** and **Fastly API key****. 
 
-![Choose Fastly](images/guides/installation/choosefastly.png "Choose Fastly")
+![Choose Fastly](Guides/images/guides/installation/choosefastly.png "Choose Fastly")
 
 **To find out you Service ID, login to the Fastly dashboard, locate your **Service name** and click on the **Show Service ID** link.*
 
-![Show Service Id](images/guides/installation/show-service-id.png "Show Service Id")
+![Show Service Id](Guides/images/guides/installation/show-service-id.png "Show Service Id")
 
 ***To find out your API key, while in the Fastly dashboard, select **Account** from the user menu and scroll way down to the bottom of the page. In the **Account API Key** area, click the **Show** button.*
 
@@ -126,21 +126,21 @@ Under the **General Settings** tab, set **Enable cache module** to **Yes** and t
 
 You can press the **Test credentials** button just to make sure that you have entered valid credentials.
 
-![Test Credentials](images/guides/installation/testcredentials.png "Test Credentials")
+![Test Credentials](Guides/images/guides/installation/testcredentials.png "Test Credentials")
 
 If you have received a success message, press the **Save Config** button.
 
-![Save config](images/guides/installation/saveconfig.png "Clear cache")
+![Save config](Guides/images/guides/installation/saveconfig.png "Clear cache")
 
 The final step is to upload the **VCL to Fastly.** You can do this by pressing the **Upload VCL to Fastly** button.
 
 The modal window will pop up, make sure that the **Activate VCL after upload** is ticked and press the **Upload** button in the top right corner:
 
-![VCL upload](images/guides/installation/vclupload.png "VCL upload")
+![VCL upload](Guides/images/guides/installation/vclupload.png "VCL upload")
 
 Once the upload process is done, the modal window will automatically close and the success message will show:
 
-![Success VCL](images/guides/installation/successvcl.png "Success VCL")
+![Success VCL](Guides/images/guides/installation/successvcl.png "Success VCL")
 
 That’s it, you have successfully configured your Magento store with the Fastly CDN.
 
