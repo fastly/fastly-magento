@@ -10,7 +10,7 @@ reliability for Magento stores. The FastlyCDN module consists of two main
 components:
 
 - The Magento module and
-- [the bundled Varnish Cache configuration file](https://github.com/fastly/fastly-magento/blob/master/app/code/community/Fastly/CDN/etc/default.vcl) (VCL).
+- [the bundled Varnish Cache configuration files](https://github.com/fastly/fastly-magento/tree/master/app/code/community/Fastly/CDN/etc/vcl_snippets) (VCL).
 
 The FastlyCDN module basically sets the correct Cache-Control headers according to the
 configuration and the visitor session and provides an interface for purging Fastly's
@@ -18,7 +18,9 @@ cache.
 
 The second component, the VCL, configures Varnish to process the client requests and
 Magento's HTML response according to the Cache-Control headers the FastlyCDN module adds
-to every response.
+to every response. It is required for full feature set. Enabling the Fastly Magento Module
+without uploading the Fastly VCL may result in pages not being complete or pages not 
+caching properly.
 
 
 # 1. Prerequisites
@@ -36,8 +38,7 @@ might be difficult.
 FastlyCDN supports Magento Community Edition from version
 1.7 and Magento Enterprise Edition from version 1.12 onwards.
 
-You need an account with [fastly.com](https://www.fastly.com/signup) which allows [uploading of custom VCL](https://docs.fastly.com/guides/vcl/uploading-custom-vcl). If you need
-professional services for setup your environment please contact fastly.com.  
+You need an account with [fastly.com](https://www.fastly.com/signup).  
 
 
 # 2. Installation
@@ -101,17 +102,47 @@ composer config extra.magento-force true
 composer require fastly/cdn
 ```
 
-## Fastly App
-
-The Fastly Magento plugin requires the ability to upload custom VCL to your services. If you don't already have it, send support@fastly.com a request asking to have the VCL uploading enabled on your account.
-
-Proceed with the configuration.
-
-
 # 3. Configuration
 
 This section handles the different configuration options
 for the module as well as settings that have to be configured on the server.
+
+Login to you Magento admin and go to:
+```
+System > Configuration > Services > Fastly CDN
+```
+
+Under the **General Settings** tab, set **Enable cache module** to **Yes** and then enter your **Fastly Service ID*** and **Fastly API key****. 
+
+![Choose Fastly](images/guides/installation/choosefastly.png "Choose Fastly")
+
+**To find out you Service ID, login to the Fastly dashboard, locate your **Service name** and click on the **Show Service ID** link.*
+
+![Show Service Id](images/guides/installation/show-service-id.png "Show Service Id")
+
+***To find out your API key, while in the Fastly dashboard, select **Account** from the user menu and scroll way down to the bottom of the page. In the **Account API Key** area, click the **Show** button.*
+
+![API key](images/guides/installation/account-api-key.png "API key")
+
+You can press the **Test credentials** button just to make sure that you have entered valid credentials.
+
+![Test Credentials](images/guides/installation/testcredentials.png "Test Credentials")
+
+If you have received a success message, press the **Save Config** button.
+
+![Save config](images/guides/installation/saveconfig.png "Clear cache")
+
+The final step is to upload the **VCL to Fastly.** You can do this by pressing the **Upload VCL to Fastly** button.
+
+The modal window will pop up, make sure that the **Activate VCL after upload** is ticked and press the **Upload** button in the top right corner:
+
+![VCL upload](images/guides/installation/vclupload.png "VCL upload")
+
+Once the upload process is done, the modal window will automatically close and the success message will show:
+
+![Success VCL](images/guides/installation/successvcl.png "Success VCL")
+
+That’s it, you have successfully configured your Magento store with the Fastly CDN.
 
 **Important:** If you are using Magento Enterprise make sure to deactive the Page
 Cache before enabling FastlyCDN module. You can do this in System > Cache
