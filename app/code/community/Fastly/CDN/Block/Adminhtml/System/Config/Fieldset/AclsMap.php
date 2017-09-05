@@ -200,6 +200,9 @@ class Fastly_CDN_Block_Adminhtml_System_Config_Fieldset_AclsMap
     {
         $control = Mage::getModel('fastlycdn/control');
         $service = $control->checkServiceDetails();
+        if(!is_array($service->versions)) {
+            return false;
+        }
         $currActiveVersion = Mage::helper('fastlycdn')->determineVersions($service->versions);
 
         $acls = $control->getAcls($currActiveVersion['active_version']);
