@@ -195,10 +195,12 @@ class Fastly_CDN_Helper_Cache extends Mage_Core_Helper_Abstract
         // ttl of 0 means "PASS" but pass is done with "private"
         if ($ttl <= 0) {
             $maxAge = 'private';
+            $response->setHeader('fastly-page-cacheable', 'NO', true);
         } else {
             $maxAge = 's-maxage=' . $ttl;
+            $response->setHeader('fastly-page-cacheable', 'YES', true);
         }
-        $cacheControlValue = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, '.$maxAge;
+        $cacheControlValue = 'max-age=0, must-revalidate, post-check=0, pre-check=0, '.$maxAge;
 
         // set stale timings
         $staleTime = (int)Mage::getStoreConfig(self::XML_PATH_FASTLY_CDN_STALE_TTL);

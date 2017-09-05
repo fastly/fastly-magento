@@ -8,6 +8,7 @@
         remove resp.http.Via;
         remove resp.http.X-Purge-URL;
         remove resp.http.X-Purge-Host;
+        remove resp.http.Fastly-page-cacheable;
     }
 
     # Clean up Vary before handing off to the user
