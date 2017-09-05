@@ -23,7 +23,7 @@
 <config>
     <modules>
         <Fastly_CDN>
-            <version>1.0.15</version>
+            <version>1.0.16</version>
         </Fastly_CDN>
     </modules>
     <global>
