@@ -193,12 +193,12 @@ class Fastly_CDN_Helper_Cache extends Mage_Core_Helper_Abstract
     public static function setTtlHeader($ttl)
     {
         // ttl of 0 means "PASS" but pass is done with "private"
+        $fastlyPageCacheable = "NO";
         if ($ttl <= 0) {
             $maxAge = 'private';
-            $response->setHeader('fastly-page-cacheable', 'NO', true);
         } else {
             $maxAge = 's-maxage=' . $ttl;
-            $response->setHeader('fastly-page-cacheable', 'YES', true);
+            $fastlyPageCacheable = "YES";
         }
         $cacheControlValue = 'max-age=0, must-revalidate, post-check=0, pre-check=0, '.$maxAge;
 
@@ -232,6 +232,9 @@ class Fastly_CDN_Helper_Cache extends Mage_Core_Helper_Abstract
                 }
             }
         }
+
+        # Expose whether page is cacheable so that we can query externally
+        $response->setHeader('fastly-page-cacheable', $fastlyPageCacheable, true);
 
         // set "Cache-Control" header
         $response->setHeader('Cache-Control', $cacheControlValue, true);
