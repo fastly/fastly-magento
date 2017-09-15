@@ -1,5 +1,9 @@
 # Fastly_Cdn Release Notes
 
+## 1.0.17
+
+- Minor VCL tweaks
+
 ## 1.0.16
 
 - Fix for a case where a Fastly service version doesn't have any ACLs or Dictionaries

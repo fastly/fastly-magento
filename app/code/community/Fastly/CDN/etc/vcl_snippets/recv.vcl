@@ -5,13 +5,13 @@
     }
 
     # Pass any checkout, cart or customer/myaccount urls
-    if (req.url ~ "/(cart|checkout|customer)") {
+    if (req.url.path ~ "/(cart|checkout|customer)") {
         set req.http.x-pass = "1";
     # Pass all admin actions
-    } else if (req.url ~ "^/(index\.php/)?admin(_.*)?/") {
+    } else if (req.url.path ~ "^/(index\.php/)?admin(_.*)?/") {
         set req.http.x-pass = "1";
     # bypass language switcher
-    } else if (req.url ~ "(?i)___from_store=.*&___store=.*") {
+    } else if (req.url.qs ~ "(?i)___from_store=.*&___store=.*") {
         set req.http.x-pass = "1";
     }
 
@@ -66,7 +66,7 @@
     }
 
     # formkey lookup
-    if (req.url ~ "/fastlycdn/getformkey/") {
+    if (req.url.path ~ "/fastlycdn/getformkey/") {
         # check if we have a formkey cookie
         if (req.http.Cookie:FASTLY_CDN_FORMKEY) {
             set req.http.Formkey = req.http.Cookie:FASTLY_CDN_FORMKEY;
@@ -79,7 +79,7 @@
     }
 
     # client.geo lookup
-    if (req.url ~ "fastlycdn/esi/getcountry/") {
+    if (req.url.path ~ "fastlycdn/esi/getcountry/") {
         # check if GeoIP has been already processed by client
         if (req.http.Cookie:FASTLY_CDN_GEOIP_PROCESSED) {
             error 200 "";
@@ -90,13 +90,13 @@
     }
 
     # client.geo get country code
-    if (req.url ~ "fastlycdn/esi/getcountrycode/") {
+    if (req.url.path ~ "fastlycdn/esi/getcountrycode/") {
         # create and set req.http.X-Country-Code
         error 755 client.geo.country_code;
     }
 
     # check for ESI calls
-    if (req.url ~ "esi_data=") {
+    if (req.url.qs ~ "esi_data=") {
         # check for valid cookie data
         if (req.http.Cookie ~ "FASTLY_CDN-([A-Za-z0-9-_]+)=([^;]*)") {
             set req.url = querystring.filter(req.url, "esi_data") + "&esi_data=" + re.group.2;
