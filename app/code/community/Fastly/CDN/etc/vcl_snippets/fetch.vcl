@@ -1,9 +1,4 @@
     if (beresp.status >= 500 && beresp.status < 600) {
-        # let SOAP errors pass - better debugging
-        if (beresp.http.Content-Type ~ "text/xml") {
-            return (deliver);
-        }
-
         /* deliver stale if the object is available */
         if (stale.exists) {
             return(deliver_stale);
@@ -48,14 +43,14 @@
         }
     }
 
-    # Force any responses with private, no-cache or no-store in Cache-Control to pass
-    if (beresp.http.Cache-Control ~ "private|no-cache|no-store") {
-        set req.http.Fastly-Cachetype = "PRIVATE";
+    # Just in case the Request Setting for x-pass is missing
+    if (req.http.x-pass) {
         return (pass);
     }
 
-    # Just in case the Request Setting for x-pass is missing
-    if (req.http.x-pass) {
+    # Force any responses with private, no-cache or no-store in Cache-Control to pass
+    if (beresp.http.Cache-Control ~ "private|no-cache|no-store") {
+        set req.http.Fastly-Cachetype = "PRIVATE";
         return (pass);
     }
 
