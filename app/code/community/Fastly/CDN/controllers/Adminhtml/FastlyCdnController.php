@@ -694,7 +694,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
                     }
 
                     if(!$status) {
-                        $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to upload the Snippet file.'));
+                        $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to remove the Snippet file.'));
                         return $this->getResponse()->setBody($jsonData);
                     }
                 }
