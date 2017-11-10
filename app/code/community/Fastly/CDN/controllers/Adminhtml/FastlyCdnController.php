@@ -648,6 +648,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
 
             $reqName = Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE.'_force_tls';
             $checkIfReqExist = $control->getRequest($activeVersion, $reqName);
+            $snippet = Mage::getModel('fastlycdn/config')->getVclSnippets('vcl_snippets_force_tls', 'recv.vcl');
 
             if(!$checkIfReqExist) {
                 $request = array(
@@ -663,12 +664,39 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
                     $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to create the REQUEST object.'));
                     return $this->getResponse()->setBody($jsonData);
                 }
+
+                // Add force Tls snipet
+                foreach($snippet as $key => $value)
+                {
+                    $snippetData = array('name' => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE.'_'.$key, 'type' => $key, 'dynamic' => "0", 'priority' => 10, 'content' => $value);
+                    $status = $control->uploadSnippet($clone->number, $snippetData);
+
+                    if(!$status) {
+                        $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to upload the Snippet file.'));
+                        return $this->getResponse()->setBody($jsonData);
+                    }
+                }
             } else {
                 $deleteRequest = $control->deleteRequest($clone->number, $reqName);
 
                 if(!$deleteRequest) {
                     $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to delete the REQUEST object.'));
                     return $this->getResponse()->setBody($jsonData);
+                }
+
+                // Remove force Tls snipet
+                foreach($snippet as $key => $value)
+                {
+                    $snippetData = array('name' => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE.'_'.$key, 'type' => $key, 'dynamic' => "0", 'priority' => 10, 'content' => $value);
+                    $status = true;
+                    if(Mage::getModel('fastlycdn/control')->getSnippet($clone->number, $snippetData['name'])) {
+                        $status = $control->removeSnippet($clone->number, $snippetData);
+                    }
+
+                    if(!$status) {
+                        $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to upload the Snippet file.'));
+                        return $this->getResponse()->setBody($jsonData);
+                    }
                 }
             }
 
