@@ -543,6 +543,9 @@ newsletter]]></disable_routes>
                 <strict_rendering_enabled>1</strict_rendering_enabled>
                 <debug>0</debug>
             </esi>
+            <webhooks>
+                <enabled>0</enabled>
+            </webhooks>
         </fastlycdn>
     </default>
 </config>

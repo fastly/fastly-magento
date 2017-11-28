@@ -182,6 +182,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
     {
         $apiKey = $this->getRequest()->getParam('api_key');
         $serviceId = $this->getRequest()->getParam('service_id');
+        $webhooks = Mage::helper('fastlycdn/webhooks');
 
         $result = Mage::getModel('fastlycdn/control')->testConnection($serviceId, $apiKey);
 
@@ -191,12 +192,14 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
         if(!$result) {
             $sendValidationReq = $statistic->sendValidationRequest(false);
             $this->_saveValidationState(false, $sendValidationReq);
+            $webhooks->sendWebHook('Testing Connection : Failed');
             return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array('status' =>  false)));
         }
 
         $sendValidationReq = $statistic->sendValidationRequest(true);
         $this->_saveValidationState(true, $sendValidationReq);
 
+        $webhooks->sendWebHook('Testing Connection : Success');
         return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array('status' =>  true)));
     }
 
@@ -327,6 +330,9 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
 
             if($activateVcl === 'true') {
                 $control->activateVersion($clone->number);
+                Mage::helper('fastlycdn/webhooks')->sendWebHook('Upload VCL has been initiated in version ' . $clone->number . ' - activated');
+            } else {
+                Mage::helper('fastlycdn/webhooks')->sendWebHook('Upload VCL has been initiated in version ' . $clone->number . ' - not activated');
             }
 
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'active_version' => $clone->number));
@@ -676,6 +682,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
                         return $this->getResponse()->setBody($jsonData);
                     }
                 }
+                $statusMsg = 'Activated';
             } else {
                 $deleteRequest = $control->deleteRequest($clone->number, $reqName);
 
@@ -698,6 +705,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
                         return $this->getResponse()->setBody($jsonData);
                     }
                 }
+                $statusMsg = 'Deactivated';
             }
 
             $validate = $control->validateServiceVersion($clone->number);
@@ -709,6 +717,9 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
 
             if($activateVcl === 'true') {
                 $control->activateVersion($clone->number);
+                Mage::helper('fastlycdn/webhooks')->sendWebHook('TLS :' . $statusMsg . ' | Version : ' . $clone->number . ' - activated');
+            } else {
+                Mage::helper('fastlycdn/webhooks')->sendWebHook('TLS :' . $statusMsg . ' | Version : ' . $clone->number . ' - not activated');
             }
 
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true));
@@ -906,6 +917,9 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
 
             if($activate_flag === 'true') {
                 $control->activateVersion($clone->number);
+                Mage::helper('fastlycdn/webhooks')->sendWebHook('Backend ' . $oldName . 'has been changed | Version : ' . $clone->number . ' - activated');
+            } else {
+                Mage::helper('fastlycdn/webhooks')->sendWebHook('Backend ' . $oldName . 'has been changed | Version : ' . $clone->number . ' - not activated');
             }
 
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'active_version' => $clone->number, 'backends' => $configureBackend));

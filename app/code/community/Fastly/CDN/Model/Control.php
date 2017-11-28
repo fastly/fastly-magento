@@ -595,6 +595,7 @@ class Fastly_CDN_Model_Control
 
             // send POST request
             $response = $client->request($verb);
+            Mage::helper('fastlycdn/webhooks')->sendWebHook('PURGE REQUEST(' . $verb . ') | URI: ' . $uri);
 
             // check response
             if ($response->getStatus() != '200') {
