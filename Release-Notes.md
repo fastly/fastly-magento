@@ -1,5 +1,9 @@
 # Fastly_Cdn Release Notes
 
+## 1.0.18
+
+- Webhooks support
+
 ## 1.0.17
 
 - Minor VCL tweaks
