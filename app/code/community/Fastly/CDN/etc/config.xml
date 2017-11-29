@@ -23,7 +23,7 @@
 <config>
     <modules>
         <Fastly_CDN>
-            <version>1.0.17</version>
+            <version>1.0.18</version>
         </Fastly_CDN>
     </modules>
     <global>
@@ -543,6 +543,9 @@ newsletter]]></disable_routes>
                 <strict_rendering_enabled>1</strict_rendering_enabled>
                 <debug>0</debug>
             </esi>
+            <webhooks>
+                <enabled>0</enabled>
+            </webhooks>
         </fastlycdn>
     </default>
 </config>

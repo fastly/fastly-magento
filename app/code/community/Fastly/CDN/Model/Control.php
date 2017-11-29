@@ -211,6 +211,25 @@ class Fastly_CDN_Model_Control
     }
 
     /**
+     * Remove regular VCL Snippet
+     *
+     * @param $version
+     * @param array $snippet
+     * @return bool|mixed
+     */
+    public function removeSnippet($version, array $snippet)
+    {
+        $url = $this->_getApiServiceUri(). 'version/' .$version. '/snippet';
+
+        $verb = \Zend_Http_Client::DELETE;
+        $url .= '/'.$snippet['name'];
+
+        $result = $this->_fetch($url, $verb);
+
+        return $result;
+    }
+
+    /**
      * Fetching an individual regular VCL Snippet
      *
      * @param $version
@@ -576,6 +595,7 @@ class Fastly_CDN_Model_Control
 
             // send POST request
             $response = $client->request($verb);
+            Mage::helper('fastlycdn/webhooks')->sendWebHook('PURGE REQUEST(' . $verb . ') | URI: ' . $uri);
 
             // check response
             if ($response->getStatus() != '200') {
