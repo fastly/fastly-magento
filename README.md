@@ -79,7 +79,7 @@ Since Magento 1 doesn't ship with a `composer.json` file, you will have to creat
     "repositories": {
         "fastly-magento": {
             "type": "git",
-            "url": "https://github.com/fastly/fastly-magento.git​"
+            "url": "https://github.com/fastly/fastly-magento.git"
         }
     },
     "extra": {
