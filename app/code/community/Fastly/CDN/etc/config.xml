@@ -545,6 +545,8 @@ newsletter]]></disable_routes>
             </esi>
             <webhooks>
                 <enabled>0</enabled>
+                <username><![CDATA[fastly-m1-bot]]></username>
+                <channel><![CDATA[fastly-webhook]]></channel>
             </webhooks>
         </fastlycdn>
     </default>
