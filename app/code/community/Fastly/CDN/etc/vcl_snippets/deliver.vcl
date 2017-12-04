@@ -14,6 +14,7 @@
     # Clean up Vary before handing off to the user
     if ( !req.http.Fastly-FF ) {
         set resp.http.Vary = regsub(resp.http.Vary, "Fastly-Cdn-Env,Https", "Cookie");
+        remove resp.http.surrogate-keys-set;
     }
 
     if (resp.http.magentomarker && !req.http.Fastly-FF) {
