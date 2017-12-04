@@ -672,9 +672,14 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
                 }
 
                 // Add force Tls snipet
-                foreach($snippet as $key => $value)
-                {
-                    $snippetData = array('name' => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE.'_'.$key, 'type' => $key, 'dynamic' => "0", 'priority' => 10, 'content' => $value);
+                foreach($snippet as $key => $value) {
+                    $snippetData = array(
+                        'name' => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE . '_force_tls_' . $key,
+                        'type' => $key,
+                        'dynamic' => "0",
+                        'priority' => 10,
+                        'content' => $value
+                    );
                     $status = $control->uploadSnippet($clone->number, $snippetData);
 
                     if(!$status) {
