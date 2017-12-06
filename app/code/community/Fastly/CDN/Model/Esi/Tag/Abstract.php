@@ -98,9 +98,7 @@ class Fastly_CDN_Model_Esi_Tag_Abstract extends Mage_Core_Model_Abstract
      */
     protected function _getEsiUrl()
     {
-        $c = get_class($this);
-        eval('$val = '.$c.'::ESI_URL;');
-        return $val;
+        return $this::ESI_URL;
     }
 
     /**
@@ -108,9 +106,7 @@ class Fastly_CDN_Model_Esi_Tag_Abstract extends Mage_Core_Model_Abstract
      */
     protected function _getEsiCookieName()
     {
-        $c = get_class($this);
-        eval('$val = '.$c.'::COOKIE_NAME;');
-        return $val;
+        return $this::COOKIE_NAME;
     }
 
     /**
@@ -127,7 +123,7 @@ class Fastly_CDN_Model_Esi_Tag_Abstract extends Mage_Core_Model_Abstract
         /**
          * skip these layout handles as they are causing to many unnecessary ESI block variants when added to the URL.
          */
-        $skipHandles = array('CATEGORY_', 'PRODUCT_', 'STORE_', 'customer_', 'THEME_', 'SHORTCUT_', 'page_','cms_', 'catalogsearch_');
+        $skipHandles = array('CATEGORY_', 'PRODUCT_', 'STORE_', 'customer_', 'THEME_', 'SHORTCUT_', 'page_','cms_', 'catalogsearch_', 'sales_order_view');
         foreach ($handles as $key => $val) {
             // remove category handle
             foreach ($skipHandles as $skipHandle) {

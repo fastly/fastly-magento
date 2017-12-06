@@ -79,13 +79,17 @@ class Fastly_CDN_Helper_Webhooks extends Mage_Core_Helper_Abstract
      */
     public function sendWebHook($message)
     {
+        if(!Mage::helper('fastlycdn/webhooks')->isEnabled()) {
+            return;
+        }
+
         $urlEndpoint = $this->getWebhookUrl();
         $username = $this->getWebookUsername();
         $channel = '#' . $this->getWebHookChannel();
         $messagePrefix = $this->getWebhookMessagePrefix();
         $storeName = Mage::app()->getStore()->getName();
         $storeUrl = Mage::app()->getStore()->getUrl();
-        $message =  $messagePrefix . $message.' on <'.$storeUrl.'|Store> | '.$storeName;
+        $message =  $messagePrefix . ' ' . $message.' on <'.$storeUrl.'|Store> | '.$storeName;
         $headers = array('Content-type: application/json');
 
         $body = json_encode(array(

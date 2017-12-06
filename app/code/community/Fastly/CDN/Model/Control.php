@@ -56,10 +56,20 @@ class Fastly_CDN_Model_Control
      * Purge a single URL
      *
      * @param $url
+     * @return bool
      */
     public function cleanUrl($url)
     {
-        $this->_purge($url, 'PURGE');
+        try {
+            $this->_purge($url, 'PURGE');
+            Mage::helper('fastlycdn')->debug('Purged fastlyCDN URL ' . $url);
+            Mage::helper('fastlycdn/webhooks')->sendWebHook('*clean by URL for* ' . $url);
+        } catch (Exception $e) {
+            Mage::helper('fastlycdn')->debug('Error during purging: ' . $e->getMessage());
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -77,6 +87,7 @@ class Fastly_CDN_Model_Control
 
             $this->_purge($uri);
             Mage::helper('fastlycdn')->debug('Purged fastlyCDN items with surrogate key ' . var_export($key, true));
+            Mage::helper('fastlycdn/webhooks')->sendWebHook("*clean by key on $key*");
         } catch (Exception $e) {
             Mage::helper('fastlycdn')->debug('Error during purging: ' . $e->getMessage());
             return false;
@@ -99,6 +110,7 @@ class Fastly_CDN_Model_Control
 
             $this->_purge($uri);
             Mage::helper('fastlycdn')->debug('Purged all fastlyCDN items');
+            Mage::helper('fastlycdn/webhooks')->sendWebHook('*initiated clean/purge all*');
         } catch (Exception $e) {
             Mage::helper('fastlycdn')->debug('Error during purging: ' . $e->getMessage());
             return false;
@@ -595,7 +607,6 @@ class Fastly_CDN_Model_Control
 
             // send POST request
             $response = $client->request($verb);
-            Mage::helper('fastlycdn/webhooks')->sendWebHook('PURGE REQUEST(' . $verb . ') | URI: ' . $uri);
 
             // check response
             if ($response->getStatus() != '200') {
