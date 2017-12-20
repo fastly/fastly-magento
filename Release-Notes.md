@@ -3,6 +3,7 @@
 ## 1.0.18
 
 - Webhooks support
+- Fix for Sales View Order ESI tag error https://github.com/fastly/fastly-magento/pull/37
 
 ## 1.0.17
 
