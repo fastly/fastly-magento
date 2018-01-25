@@ -285,9 +285,11 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             }
 
             $snippets = Mage::getModel('fastlycdn/config')->getVclSnippets();
+            $templateHelper = Mage::helper('fastlycdn/template');
 
             foreach($snippets as $key => $value)
             {
+                $value = $templateHelper->replaceSnippetValues($value);
                 $snippetData = array('name' => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE.'_'.$key, 'type' => $key, 'dynamic' => "0", 'priority' => 50, 'content' => $value);
                 $status = $control->uploadSnippet($clone->number, $snippetData);
 

@@ -8,7 +8,7 @@
     if (req.url.path ~ "/(cart|checkout|customer)") {
         set req.http.x-pass = "1";
     # Pass all admin actions
-    } else if (req.url.path ~ "^/(index\.php/)?admin(_.*)?/") {
+    } else if (req.url.path ~ "^/(index\.php/)?####ADMIN_PATH####(_.*)?/") {
         set req.http.x-pass = "1";
     # bypass language switcher
     } else if (req.url.qs ~ "(?i)___from_store=.*&___store=.*") {
@@ -106,7 +106,7 @@
     # Per suggestions in https://github.com/sdinteractive/SomethingDigital_PageCacheParams
     # we'll strip out query parameters used in Google AdWords, Mailchimp tracking
     set req.http.Magento-Original-URL = req.url;
-    set req.url = querystring.regfilter(req.url, "^(utm_.*|gclid|gdftrk|_ga|mc_.*)");
+    set req.url = querystring.regfilter(req.url, "^(####QUERY_PARAMETERS####)");
     # Sort the query arguments to increase cache hit ratio with query arguments that
     # may be out of order however only on URLs that are not being passed. 
     if ( !req.http.x-pass ) {
