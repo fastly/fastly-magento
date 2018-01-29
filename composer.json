@@ -1,7 +1,7 @@
 {
     "name": "fastly/cdn",
     "type": "magento-module",
-    "license":"community",
+    "license": "BSD-3-Clause",
     "description":"Fastly CDN module for Magento 1.x",
     "version": "1.0.18",
     "authors":[
