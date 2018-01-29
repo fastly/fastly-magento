@@ -3,7 +3,7 @@
     "type": "magento-module",
     "license": "BSD-3-Clause",
     "description":"Fastly CDN module for Magento 1.x",
-    "version": "1.0.18",
+    "version": "1.0.19",
     "authors":[
         {
             "name":"Fastly",

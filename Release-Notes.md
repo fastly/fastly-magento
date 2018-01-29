@@ -1,5 +1,9 @@
 # Fastly_Cdn Release Notes
 
+## 1.0.19
+
+- No changes except a fix for composer.json
+
 ## 1.0.18
 
 - Webhooks support
