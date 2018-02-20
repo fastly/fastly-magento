@@ -89,3 +89,7 @@
         }
 
     }
+
+    if (beresp.status == 404 && req.url.path ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico|webp|svg)$") {
+        unset beresp.http.set-cookie;
+    }
