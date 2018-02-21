@@ -1,5 +1,9 @@
 # Fastly_Cdn Release Notes
 
+## 1.0.20
+
+- Minor VCL fix to make sure 404 images don't end up overwriting user cookies
+
 ## 1.0.19
 
 - No changes except a fix for composer.json
