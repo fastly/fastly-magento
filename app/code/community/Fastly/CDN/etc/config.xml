@@ -536,6 +536,7 @@ newsletter]]></disable_routes>
                 <purge_catalog_product>0</purge_catalog_product>
                 <purge_cms_page>0</purge_cms_page>
                 <debug>0</debug>
+                <template_query>utm_.*, gclid, gdftrk, _ga, mc_.*</template_query>
             </general>
             <esi>
                 <default_ttl>3600</default_ttl>
