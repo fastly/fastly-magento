@@ -13,7 +13,7 @@
 
     }
 
-    if (beresp.http.X-Esi || beresp.http.Content-Type ~ "^text/(html|xml)") {
+    if (beresp.http.X-Esi) {
         # enable ESI feature for Magento response by default
         esi;
         if (!beresp.http.Vary ~ "Fastly-Cdn-Env,Https") {
@@ -23,14 +23,12 @@
                     set beresp.http.Vary = "Fastly-Cdn-Env,Https";
                 }
         }
-        # marker for vcl_deliver to reset Age:
-        set beresp.http.magentomarker = "1";
         # Since varnish doesn't compress ESIs we need to hint to the HTTP/2 terminators to
         # compress it
         set beresp.http.x-compress-hint = "on";
     } else {
         # enable gzip for all static content
-        if (http_status_matches(beresp.status, "200,404") && (beresp.http.content-type ~ "^(application\/x\-javascript|text\/css|application\/javascript|text\/javascript|application\/json|application\/vnd\.ms\-fontobject|application\/x\-font\-opentype|application\/x\-font\-truetype|application\/x\-font\-ttf|application\/xml|font\/eot|font\/opentype|font\/otf|image\/svg\+xml|image\/vnd\.microsoft\.icon|text\/plain)\s*($|;)" || req.url.ext ~ "(?i)(css|js|html|eot|ico|otf|ttf|json)" ) ) {
+        if (http_status_matches(beresp.status, "200,404") && (beresp.http.content-type ~ "^(application\/x\-javascript|text\/css|text\/html|application\/javascript|text\/javascript|application\/json|application\/vnd\.ms\-fontobject|application\/x\-font\-opentype|application\/x\-font\-truetype|application\/x\-font\-ttf|application\/xml|font\/eot|font\/opentype|font\/otf|image\/svg\+xml|image\/vnd\.microsoft\.icon|text\/plain)\s*($|;)" || req.url.ext ~ "(?i)(css|js|html|eot|ico|otf|ttf|json)" ) ) {
             # always set vary to make sure uncompressed versions dont always win
             if (!beresp.http.Vary ~ "Accept-Encoding") {
                 if (beresp.http.Vary) {
@@ -69,7 +67,7 @@
 
         # If surrogate keys have been set do not set them again
         if ( !beresp.http.surrogate-keys-set ) {
-            if (beresp.http.magentomarker) {
+            if (beresp.http.x-esi) {
                 # init surrogate keys
                 if (beresp.http.Surrogate-Key) {
                     set beresp.http.Surrogate-Key = beresp.http.Surrogate-Key " text";

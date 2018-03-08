@@ -17,10 +17,11 @@
         remove resp.http.surrogate-keys-set;
     }
 
-    if (resp.http.magentomarker && !req.http.Fastly-FF) {
-        # Remove the magic marker
-        unset resp.http.magentomarker;
+    if (resp.http.x-esi && !req.http.Fastly-FF) {
+        # Remove the ESI marker
+        unset resp.http.x-esi;
 
+        # Tell browsers not to cache the content
         set resp.http.Cache-Control = "no-store, no-cache, must-revalidate, post-check=0, pre-check=0";
         set resp.http.Pragma        = "no-cache";
         set resp.http.Expires       = "Mon, 31 Mar 2008 10:00:00 GMT";

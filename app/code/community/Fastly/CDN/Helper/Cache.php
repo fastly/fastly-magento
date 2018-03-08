@@ -242,6 +242,9 @@ class Fastly_CDN_Helper_Cache extends Mage_Core_Helper_Abstract
         // set "Expires" header in the past to keep mod_expires from applying it's ruleset
         $response->setHeader('Expires', 'Mon, 31 Mar 2008 10:00:00 GMT', true);
 
+        // This page potentially has ESIs so as a first cut let's mark it as such
+        $response->setHeader("X-Esi", "1");
+
         $response->setHeader("Fastly-Module-Enabled", "1.0.21", true);
     }
 
