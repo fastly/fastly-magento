@@ -72,7 +72,7 @@ class Fastly_CDN_Block_Adminhtml_System_Config_Fieldset_DictionariesMap
      */
     protected function _getRowTemplateHtml($dictionary)
     {
-        if($dictionary != -1) {
+        if(is_int($dictionary) == true && $dictionary != -1) {
             $name = $dictionary->name;
             $id = $dictionary->id;
             $html = '<tr id="'. $name .'">';
