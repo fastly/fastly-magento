@@ -29,10 +29,6 @@
                 <name>js/fastlycdn/fastly.js</name>
             </action>
             <action method="addItem">
-                <type>skin_js</type>
-                <name>js/fastlycdn/fastly.js</name>
-            </action>
-            <action method="addItem">
                 <type>skin_css</type>
                 <name>css/fastlycdn/fastly.css</name>
             </action>
