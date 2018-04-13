@@ -378,6 +378,16 @@ var Fastly = {
         if ($('error-page-form-activate').checked == true) {
             activate_flag = true;
         }
+        var errorHtmlChars = $('error-page-form-html').value.length;
+        var maxChars = 65535;
+        if (errorHtmlChars >= maxChars) {
+            var msgWarning = $(this.divId+'-error-dialog-box');
+            var text = 'The HTML must contain less than ' + maxChars + ' characters. ' +
+                'Current number of characters: ' + errorHtmlChars;
+            msgWarning.update(text);
+            msgWarning.show();
+            return;
+        }
         new Ajax.Request(update_error_page_url, {
             method:'post',
             parameters: {
