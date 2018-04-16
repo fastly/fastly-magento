@@ -8,7 +8,7 @@
     if (req.url.path ~ "/(cart|checkout|customer)") {
         set req.http.x-pass = "1";
     # Pass all admin actions
-    } else if (req.url.path ~ "^/(index\.php/)?####ADMIN_PATH####(_.*)?/") {
+    } else if (req.url.path ~ "^/(index\.php/)?####ADMIN_PATH####/") {
         set req.http.x-pass = "1";
     # bypass language switcher
     } else if (req.url.qs ~ "(?i)___from_store=.*&___store=.*") {
@@ -26,30 +26,33 @@
         unset req.http.Fastly-Cdn-Env;
     }
 
-    # auth for purging
+    ############################################################################################################
+    # Following code block controls purge by URL. By default we want to protect all URL purges. In general this
+    # is addressed by adding Fastly-Purge-Requires-Auth request header in vcl_recv however this runs the risk of
+    # exposing API tokens if user attempts to purge non-https URLs. For this reason inside the Magento module
+    # we use X-Purge-Token. Unfortunately this breaks purge from the Fastly UI. Therefore in the next code block
+    # we check for presence of X-Purge-Token. If it's not present we force the Fastly-Purge-Requires-Auth
     if (req.request == "FASTLYPURGE") {
+        # extract token signature and expiration
+        if (req.http.X-Purge-Token && req.http.X-Purge-Token ~ "^([^_]+)_(.*)" ) {
 
-        if (!req.http.X-Purge-Token ~ "^([^_]+)_(.*)" ) {
-            error 403;
-        }
+            declare local var.X-Exp STRING;
+            declare local var.X-Sig STRING;
+            /* extract token expiration and signature */
+            set var.X-Exp = re.group.1;
+            set var.X-Sig = re.group.2;
 
-        declare local var.X-Exp STRING;
-        declare local var.X-Sig STRING;
-        /* extract token expiration and signature */
-        set var.X-Exp = re.group.1;
-        set var.X-Sig = re.group.2;
-
-        /* validate signature */
-        if (var.X-Sig == regsub(digest.hmac_sha1(req.service_id, req.url.path var.X-Exp), "^0x", "")) {
+            /* validate signature */
+            if (var.X-Sig == regsub(digest.hmac_sha1(req.service_id, req.url.path var.X-Exp), "^0x", "")) {
             /* check that expiration time has not elapsed */
             if (time.is_after(now, std.integer2time(std.atoi(var.X-Exp)))) {
                 error 410;
             }
+            }
 
         } else {
-            error 403;
+            set req.http.Fastly-Purge-Requires-Auth = "1";
         }
-
     }
 
     # disable ESI processing on Origin Shield
