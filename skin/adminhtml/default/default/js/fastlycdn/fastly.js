@@ -1,5 +1,9 @@
 document.observe("dom:loaded", function() {
 
+    if ($('fastlycdn_general_enabled') === null) {
+        return;
+    }
+
     $('fastlycdn_general_enabled').observe('change', function (event) {
         $('row_fastlycdn_general_test_connection').toggle(event.findElement().value);
         $('row_fastlycdn_general_upload_vcl').toggle(event.findElement().value);
