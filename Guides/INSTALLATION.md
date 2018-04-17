@@ -4,7 +4,7 @@ This guide will show you how to install and configure Fastly CDN extension for M
 
 You may choose between two installation methods – composer installation and manual installation by downloading the zip file.
 
-We will go with a second approach - manually downloading the [https://github.com/fastly/fastly-magento/releases](zip file). 
+We will go with a second approach - manually downloading the ![https://github.com/fastly/fastly-magento/releases](zip file). 
 
 1. Download the zip archive of this repository to a temporary location on your server and extract it.
 2. Copy the contents of the app directory in the archive to the app directory of your Magento instance.
