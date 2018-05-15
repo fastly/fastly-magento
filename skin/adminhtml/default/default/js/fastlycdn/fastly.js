@@ -4,6 +4,8 @@ document.observe("dom:loaded", function() {
         return;
     }
 
+    Fastly.checkFpc();
+
     $('fastlycdn_general_enabled').observe('change', function (event) {
         $('row_fastlycdn_general_test_connection').toggle(event.findElement().value);
         $('row_fastlycdn_general_upload_vcl').toggle(event.findElement().value);
@@ -159,6 +161,19 @@ var Fastly = {
 
     setLoaderZIndex: function () {
         $('loading-mask').setStyle({'z-index':10000});
+    },
+
+    checkFpc: function () {
+        var html = '<ul class="messages"><li class="error-msg">' +
+            '<ul><li>' +
+            'Please make sure that "Page Cache" in the System > Cache Management settings is disabled.' +
+            '</li></ul></li></ul>';
+        if (is_fpc_enabled == true) {
+            $('messages').update(html);
+            if (is_enabled == false) {
+                $('fastlycdn_general_enabled').disabled = true;
+            }
+        }
     },
 
     init: function () {
