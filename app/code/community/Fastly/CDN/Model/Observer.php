@@ -820,7 +820,7 @@ class Fastly_CDN_Model_Observer
      */
     public function checkFpc(Varien_Event_Observer $observer){
         $params = Mage::app()->getRequest()->getParam('types');
-        $error = 'Please disable Fastly CDN before enabling "Full page caching".';
+        $error = 'Please disable Fastly CDN before enabling "Page Cache".';
         foreach ($params as $key => $value) {
             if ($value == 'full_page' && $this->_isCacheEnabled()) {
                 Mage::getSingleton('core/session')->addError($error);
