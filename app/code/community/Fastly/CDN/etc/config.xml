@@ -177,6 +177,16 @@
                 </observers>
             </controller_action_predispatch_adminhtml>
 
+            <!-- prevent cache management mass enable action if enabling Page Cache while Fastly CDN is enabled -->
+            <controller_action_predispatch_adminhtml_cache_massEnable>
+                <observers>
+                    <fastlycdn>
+                        <class>fastlycdn/observer</class>
+                        <method>checkFpc</method>
+                    </fastlycdn>
+                </observers>
+            </controller_action_predispatch_adminhtml_cache_massEnable>
+
             <!-- clean CDN page cache together with magento -->
             <controller_action_postdispatch_adminhtml_cache_flushAll>
                 <observers>

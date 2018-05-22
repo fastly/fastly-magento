@@ -56,6 +56,23 @@ class Fastly_CDN_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Check whether FPC is enabled
+     *
+     * @return bool
+     */
+    public function isFpcEnabled()
+    {
+        $cacheTypes = Mage::app()->getCacheInstance()->getTypes();
+        foreach ($cacheTypes as $key) {
+            $typeData = $key->getData();
+            if ($typeData['id'] == 'full_page' && $typeData['status'] == 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns Fastly CDN module version
      *
      * @return Mage_Core_Model_Config_Element

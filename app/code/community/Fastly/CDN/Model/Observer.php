@@ -812,4 +812,25 @@ class Fastly_CDN_Model_Observer
             }
         }
     }
+
+    /**
+     * Prevents enabling of FPC if Fastly CDN is enabled
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function checkFpc(Varien_Event_Observer $observer){
+        $params = Mage::app()->getRequest()->getParam('types');
+        $error = 'Please disable Fastly CDN before enabling "Page Cache".';
+        foreach ($params as $key => $value) {
+            if ($value == 'full_page' && $this->_isCacheEnabled()) {
+                Mage::getSingleton('core/session')->addError($error);
+                $action = $observer->getEvent()->getControllerAction();
+                $action->setFlag('', Mage_Core_Controller_Varien_Action::FLAG_NO_DISPATCH, false);
+                $url = Mage::helper('core/http')->getHttpReferer();
+                Mage::app()->getFrontController()->getResponse()->setRedirect($url);
+                Mage::app()->getResponse()->sendResponse();
+                exit;
+            }
+        }
+    }
 }
