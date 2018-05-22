@@ -1,5 +1,10 @@
 # Fastly_Cdn Release Notes
 
+## 1.0.24
+
+- Add code to make sure user doesn't enable FPC in conjunction with Fastly module as that leads to bad behavior
+  https://github.com/fastly/fastly-magento/pull/43
+
 ## 1.0.23.
 
 - Fix inability to do purge all via Fastly UI
