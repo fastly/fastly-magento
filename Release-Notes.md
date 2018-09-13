@@ -1,5 +1,9 @@
 # Fastly_Cdn Release Notes
 
+## 1.0.25
+
+- Minor VCL changes
+
 ## 1.0.24
 
 - Add code to make sure user doesn't enable FPC in conjunction with Fastly module as that leads to bad behavior
