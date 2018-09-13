@@ -57,6 +57,7 @@
     # Varnish sets default TTL if none of these are present. Assume if they are not present that we don't want to cache
     if (!beresp.http.Expires && !beresp.http.Surrogate-Control ~ "max-age" && !beresp.http.Cache-Control ~ "(s-maxage|max-age)") {
         set beresp.ttl = 0s;
+        set beresp.cacheable = false;
     }
 
     # If origin provides TTL for an object we cache it
@@ -88,6 +89,8 @@
 
     }
 
+    # If for whatever reason we get a 404 on static asset requests make sure we strip out set-cookies. Otherwise we run
+    # the risk of resetting the session since we strip out user cookies for static paths
     if (beresp.status == 404 && req.url.path ~ "^/(media|js|skin)/.*\.(png|jpg|jpeg|gif|css|js|swf|ico|webp|svg)$") {
         unset beresp.http.set-cookie;
     }
