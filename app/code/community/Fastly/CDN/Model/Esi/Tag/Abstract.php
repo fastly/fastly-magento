@@ -123,7 +123,7 @@ class Fastly_CDN_Model_Esi_Tag_Abstract extends Mage_Core_Model_Abstract
         /**
          * skip these layout handles as they are causing to many unnecessary ESI block variants when added to the URL.
          */
-        $skipHandles = array('CATEGORY_', 'PRODUCT_', 'STORE_', 'customer_', 'THEME_', 'SHORTCUT_', 'page_','cms_', 'catalogsearch_', 'sales_order_view');
+        $skipHandles = array('CATEGORY_', 'PRODUCT_', 'STORE_', 'customer_', 'THEME_', 'SHORTCUT_', 'page_','cms_', 'catalogsearch_', 'sales_order_');
         foreach ($handles as $key => $val) {
             // remove category handle
             foreach ($skipHandles as $skipHandle) {
