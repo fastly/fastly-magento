@@ -779,7 +779,7 @@ class Fastly_CDN_Model_Observer
                     }
                 }
 
-                $fastlyVer = Mage::helper('fastlycdn')->__(Mage::getConfig()->getNode('modules/Fastly_CDN/version'));
+                $fastlyVer = Mage::getConfig()->getNode('modules/Fastly_CDN/version');
 
                 if(isset($fastlyVer)) {
                     if ($fastlyVer > trim(Mage::getStoreConfig(Fastly_CDN_Helper_Data::XML_FASTLY_MODULE_VERSION))) {
