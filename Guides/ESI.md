@@ -35,8 +35,8 @@ box with ESI URL.
 
 If you don’t see the ESI directives please investigate following
 
-  # If caching is turned on, flush cache then check parent blocks
-  # Check does your custom block fire event `core_block_abstract_to_html_after`. All logic for implementation of
+1. If caching is turned on, flush cache then check parent blocks
+2. Check does your custom block fire event `core_block_abstract_to_html_after`. All logic for implementation of
   ESI is in observer `Fastly_CDN_Model_Observer` and in method `replaceBlockByEsiTag`
 
 
