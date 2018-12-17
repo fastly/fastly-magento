@@ -1,5 +1,11 @@
 # Fastly_Cdn Release Notes
 
+
+## 1.0.26
+
+- Change sales_order_view to sales_order_ to handle all routes https://github.com/fastly/fastly-magento/pull/46
+- Fix ESI include path, fix translate warnings https://github.com/fastly/fastly-magento/pull/45
+
 ## 1.0.25
 
 - Minor VCL changes
