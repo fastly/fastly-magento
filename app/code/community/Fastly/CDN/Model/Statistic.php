@@ -188,7 +188,7 @@ class Fastly_CDN_Model_Statistic extends Mage_Core_Model_Abstract
             // Site location
             'cd5'   =>  $this->getSiteLocation(),
             // Fastly version
-            'cd6'   =>  Mage::helper('fastlycdn')->__(Mage::getConfig()->getNode('modules/Fastly_CDN/version')),
+            'cd6'   =>  Mage::getConfig()->getNode('modules/Fastly_CDN/version'),
             // CID
             'cd7'   =>  (!$this->_cid) ? $this->getHelper()->getCID() : $this->_cid,
             // Anti spam protection
