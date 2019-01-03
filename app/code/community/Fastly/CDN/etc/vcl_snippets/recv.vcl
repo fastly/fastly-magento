@@ -102,8 +102,17 @@
     # check for ESI calls
     if (req.url.qs ~ "esi_data=") {
         # check for valid cookie data
-        if (req.http.Cookie ~ "FASTLY_CDN-([A-Za-z0-9-_]+)=([^;]*)") {
-            set req.url = querystring.filter(req.url, "esi_data") + "&esi_data=" + re.group.2;
+        declare local var.esi_data_field STRING;
+        declare local var.cookie_data STRING;
+        # Based on esi_data value requested we will need to search for cookie FASTLY_CDN-<type> e.g. FASTLY_CDN-customer_quote
+        set var.esi_data_field = "FASTLY_CDN-" subfield(req.url.qs, "esi_data", "&");
+        # We can't use variables in either subfield or regex so we need to use this workaround
+        # to extract value of cookie that we compiled in esi_data_field
+        set var.cookie_data = std.strstr(req.http.Cookie,var.esi_data_field);
+        set var.cookie_data = regsub(var.cookie_data,"^[^=]*=([^;]*).*","\1");
+        # If found a value we replace the query string with the contents of that cookie
+        if ( var.cookie_data != "" ) {
+          set req.url = querystring.set(req.url, "esi_data", var.cookie_data);
         }
     }
 
