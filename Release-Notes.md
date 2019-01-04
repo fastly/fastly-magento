@@ -1,5 +1,8 @@
 # Fastly_Cdn Release Notes
 
+## 1.0.2.7
+
+- Fix for the ESI FASTLY_CDN-cookie replacement logic https://github.com/fastly/fastly-magento/commit/0575218ceba5bc2dba8b8d37c0aa132f6319c727
 
 ## 1.0.26
 
