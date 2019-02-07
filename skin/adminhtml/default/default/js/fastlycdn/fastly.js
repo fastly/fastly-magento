@@ -597,7 +597,7 @@ var Fastly = {
             return;
         }
 
-        if (parseInt(webp_quality) < 0 || parseInt(webp_quality) > 100 || parseInt(jpeg_quality) < 0 || parseInt(jpeg_quality))
+        if (parseInt(webp_quality) < 0 || parseInt(webp_quality) > 100 || parseInt(jpeg_quality) < 0 || parseInt(jpeg_quality) > 100)
         {
             alert('WebP and JPEG quality values must be between 0 and 100');
             return;
