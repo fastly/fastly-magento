@@ -28,6 +28,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
 
 
     const FORCE_TLS_SETTING_NAME = 'magentomodule_force_tls';
+    const IO_SETTING_NAME = 'magentomodule_image_optimization';
     /**
      * VCL error snippet path
      */
@@ -701,7 +702,7 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
                 // Remove force Tls snipet
                 foreach($snippet as $key => $value)
                 {
-                    $snippetData = array('name' => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE.'_'.$key, 'type' => $key, 'dynamic' => "0", 'priority' => 10, 'content' => $value);
+                    $snippetData = array('name' => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE.'_force_tls_'.$key, 'type' => $key, 'dynamic' => "0", 'priority' => 10, 'content' => $value);
                     $status = true;
                     if(Mage::getModel('fastlycdn/control')->getSnippet($clone->number, $snippetData['name'])) {
                         $status = $control->removeSnippet($clone->number, $snippetData);
@@ -752,6 +753,28 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             }
 
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'errorPageResp' => $response));
+            return $this->getResponse()->setBody($jsonData);
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    public function getIoConfigRespObjAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $activeVersion = $this->getRequest()->getParam('active_version');
+            $response = $control->getIoDefaultConfigOptions($activeVersion);
+
+            if (!$response) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to fetch IO Config Response object.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'ioConfigResp' => $response));
             return $this->getResponse()->setBody($jsonData);
         } catch (\Exception $e) {
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
@@ -828,6 +851,104 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
 
             if(!$createResponse) {
                 $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to create a RESPONSE object.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $validate = $control->validateServiceVersion($clone->number);
+
+            if($validate->status == 'error') {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to validate service version: '.$validate->msg));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if($activateVcl === 'true') {
+                $control->activateVersion($clone->number);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'active_version' => $clone->number));
+            return $this->getResponse()->setBody($jsonData);
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function checkFastlyIoSettingAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+            $status = $control->checkImageOptimizationStatus();
+
+            if (!$status) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to check Image Optimization status.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true));
+            return $this->getResponse()->setBody($jsonData);
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function updateIoConfigAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $activeVersion = $this->getRequest()->getParam('active_version');
+            $activateVcl = $this->getRequest()->getParam('activate_flag');
+            $service = $control->checkServiceDetails();
+
+            if(!$service) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to check Service details.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $currActiveVersion = Mage::helper('fastlycdn')->determineVersions($service->versions);
+
+            if($currActiveVersion['active_version'] != $activeVersion) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Active versions mismatch.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $clone = $control->cloneVersion($currActiveVersion['active_version']);
+
+            if(!$clone) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to clone active version.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $id = $service->id . '-' . $clone->number . '-imageopto';
+
+            $params = json_encode([
+                'data' => [
+                    'id'    => $id,
+                    'type'  => 'io_settings',
+                    'attributes' => [
+                        'webp'          => $this->getRequest()->getParam('webp'),
+                        'webp_quality'  => $this->getRequest()->getParam('webp_quality'),
+                        'jpeg_type'     => $this->getRequest()->getParam('jpeg_type'),
+                        'jpeg_quality'  => $this->getRequest()->getParam('jpeg_quality'),
+                        'upscale'       => $this->getRequest()->getParam('upscale'),
+                        'resize_filter' => $this->getRequest()->getParam('resize_filter')
+                    ]
+                ]
+            ]);
+
+            $status = $control->configureIoConfigOptions($params, $clone->number);
+
+            if (!$status) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to update Image Optimization Default Configuration.'));
                 return $this->getResponse()->setBody($jsonData);
             }
 
@@ -1200,6 +1321,142 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true));
             return $this->getResponse()->setBody($jsonData);
 
+        } catch (\Exception $e) {
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    /**
+     * Check if IO is enabled\disabled
+     *
+     * @return Zend_Controller_Response_Abstract
+     */
+    public function checkIoSettingAction()
+    {
+        try {
+            $activeVersion = $this->getRequest()->getParam('active_version');
+            $req = Mage::getModel('fastlycdn/control')->getRequest($activeVersion, self::IO_SETTING_NAME);
+
+            if(!$req) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true, 'req_setting' => $req));
+            return $this->getResponse()->setBody($jsonData);
+        } catch (\Exception $e) {
+            $jsonData = Mage::helper('core')->jsonEncode(array('status' => false, 'error' => array('msg' => $e->getMessage())));
+            return $this->getResponse()->setBody($jsonData);
+        }
+    }
+
+    public function toggleIoAction()
+    {
+        try {
+            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $control = Mage::getModel('fastlycdn/control');
+
+            $activeVersion = $this->getRequest()->getParam('active_version');
+            $activateVcl = $this->getRequest()->getParam('activate_flag');
+            $service = $control->checkServiceDetails();
+
+            if(!$service) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to check Service details.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $currActiveVersion = Mage::helper('fastlycdn')->determineVersions($service->versions);
+
+            if($currActiveVersion['active_version'] != $activeVersion) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Active versions mismatch.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $clone = $control->cloneVersion($currActiveVersion['active_version']);
+
+            if(!$clone) {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to clone active version.'));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            $reqName = Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE.'_image_optimization';
+            $checkIfReqExist = $control->getRequest($activeVersion, $reqName);
+            $snippet = Mage::getModel('fastlycdn/config')->getVclSnippets('vcl_snippets_image_optimizations', 'recv.vcl');
+
+            if(!$checkIfReqExist) {
+                $request = array(
+                    'name' => $reqName,
+                    'service_id' => $service->id,
+                    'version' => $currActiveVersion['active_version'],
+                    'force_ssl' => true
+                );
+
+                $createReq = $control->createRequest($clone->number, $request);
+
+                if(!$createReq) {
+                    $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to create the REQUEST object.'));
+                    return $this->getResponse()->setBody($jsonData);
+                }
+
+                // Add IO snippet
+                foreach($snippet as $key => $value) {
+                    $snippetData = array(
+                        'name' => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE . '_image_optimization_' . $key,
+                        'type' => $key,
+                        'dynamic' => "0",
+                        'priority' => 10,
+                        'content' => $value
+                    );
+                    $status = $control->uploadSnippet($clone->number, $snippetData);
+
+                    if(!$status) {
+                        $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to upload the Snippet file.'));
+                        return $this->getResponse()->setBody($jsonData);
+                    }
+                }
+                $statusMsg = 'Activated';
+            } else {
+                $deleteRequest = $control->deleteRequest($clone->number, $reqName);
+
+                if(!$deleteRequest) {
+                    $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to delete the REQUEST object.'));
+                    return $this->getResponse()->setBody($jsonData);
+                }
+
+                // Remove IO snippet
+                foreach($snippet as $key => $value)
+                {
+                    $snippetData = array('name' => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE.'_image_optimization_'.$key, 'type' => $key, 'dynamic' => "0", 'priority' => 10, 'content' => $value);
+                    $status = true;
+                    if(Mage::getModel('fastlycdn/control')->getSnippet($clone->number, $snippetData['name'])) {
+                        $status = $control->removeSnippet($clone->number, $snippetData);
+                    }
+
+                    if(!$status) {
+                        $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to remove the Snippet file.'));
+                        return $this->getResponse()->setBody($jsonData);
+                    }
+                }
+                $statusMsg = 'Deactivated';
+            }
+
+            $validate = $control->validateServiceVersion($clone->number);
+
+            if($validate->status == 'error') {
+                $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => 'Failed to validate service version: '.$validate->msg));
+                return $this->getResponse()->setBody($jsonData);
+            }
+
+            if($activateVcl === 'true') {
+                $control->activateVersion($clone->number);
+                Mage::helper('fastlycdn/webhooks')->sendWebHook('Image Optimization :' . $statusMsg . ' | Version : ' . $clone->number . ' - activated');
+            } else {
+                Mage::helper('fastlycdn/webhooks')->sendWebHook('Image Optimization :' . $statusMsg . ' | Version : ' . $clone->number . ' - not activated');
+            }
+
+            $jsonData =  Mage::helper('core')->jsonEncode(array('status' => true));
+            return $this->getResponse()->setBody($jsonData);
         } catch (\Exception $e) {
             $jsonData =  Mage::helper('core')->jsonEncode(array('status' => false, 'msg' => $e->getMessage()));
             return $this->getResponse()->setBody($jsonData);

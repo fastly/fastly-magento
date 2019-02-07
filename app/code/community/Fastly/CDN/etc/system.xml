@@ -418,6 +418,41 @@
                         </error_maintenance>
                     </fields>
                 </error_maintenance_page>
+                <image_optimization translate="label comment" module="fastlycdn">
+                    <label>Image Optimization Settings</label>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <sort_order>75</sort_order>
+                    <fields>
+                        <toggle_io translate="label comment">
+                            <label>Image Optimization</label>
+                            <comment>VCL snippet upload is required in order to funnel image requests to Fastly optimizers</comment>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_toggleIoBtn</frontend_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <enabled>1</enabled>
+                            </depends>
+                        </toggle_io>
+                        <io_config translate="label comment">
+                            <label>Default IO Config Options</label>
+                            <comment>Allows you to (re)configure items such as default quality levels lossy image formats, auto WebP, JPG types.</comment>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>fastlycdn/adminhtml_system_config_fieldset_ioConfigBtn</frontend_model>
+                            <sort_order>65</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <enabled>1</enabled>
+                            </depends>
+                        </io_config>
+                    </fields>
+                </image_optimization>
                 <webhooks translate="label comment" module="fastlycdn">
                     <label>Webhooks Settings</label>
                     <show_in_default>1</show_in_default>

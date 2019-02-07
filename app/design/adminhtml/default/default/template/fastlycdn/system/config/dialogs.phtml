@@ -52,6 +52,32 @@
         </form>
     </div>
 
+    <!-- Toggle IO form -->
+
+    <div id="toggle-io-form">
+        <div class="content-header">
+            <p class="form-buttons"><button id="toggle-io-form-cancel" title="Cancel" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()"><span><span><span>Back</span></span></span></button><button id="toggle-io-form-upload" title="Upload" type="button" class="scalable save" onclick="Fastly.toggleIo(); return false;"><span><span><span>Upload</span></span></span></button></p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg" id="toggle-io-form-warning-dialog-box"><ul><li><span id="toggle-io-form-warning-label"></span></li></ul></li>
+                <li class="error-msg" id="toggle-io-form-error-dialog-box" style="display:none;"><ul><li><span id="toggle-io-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <table class="form-list" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td class="label"><label for="toggle-io-form-activate">Activate VCL after upload</label></td>
+                    <td class="value">
+                        <input id="toggle-io-form-activate" name="toggle-io-form-activate" value="1" checked="checked" type="checkbox">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
     <!-- Error page form -->
 
     <div id="error-page-form">
@@ -77,6 +103,236 @@
                     <td class="label"><label for="error-page-form-html">HTML (max 65535 characters)</label></td>
                     <td class="value">
                         <textarea rows="10" name="error-page-form-html" required="required" id="error-page-form-html"></textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <!-- Image Optimization Configuration form -->
+
+    <div id="io-config-form">
+        <div class="content-header">
+            <p class="form-buttons"><button id="io-config-form-cancel" title="Cancel" type="button" class="scalable back" onclick="Fastly.closeDialogWindow()"><span><span><span>Back</span></span></span></button><button id="io-config-form-upload" title="Upload" type="button" class="scalable save" onclick="Fastly.updateIoConfig(); return false;"><span><span><span>Update</span></span></span></button></p>
+        </div>
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg" id="io-config-form-warning-dialog-box"><ul><li><span id="io-config-form-warning-label"></span></li></ul></li>
+                <li class="error-msg" id="io-config-form-error-dialog-box" style="display:none;"><ul><li><span id="io-config-form-error-label"></span></li></ul></li>
+            </ul>
+        </div>
+        <form action="#" method="POST" class="form-inline" enctype="multipart/form-data">
+            <table class="form-list" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td class="label"><label for="io-config-form-activate">Activate after the change</label></td>
+                    <td class="value">
+                        <input id="io-config-form-activate" name="io-config-form-activate" value="1" checked="checked" type="checkbox">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        <div class="admin__field field _required">
+                            <label class="admin__field-label">
+                                <span><?php /* @noEscape */ echo __("Auto WebP?") ?></span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="value">
+                        <div class="admin__field admin__field-option">
+                            <input type="radio" id="webp-no" class="admin__control-radio" name="webp-radio" value="0"/>
+                            <label class="admin__field-label" for="webp-no">
+                                <b>No</b> - Use the origin image file type or chosen format.
+                            </label>
+                        </div>
+                        <div class="admin__field admin__field-option">
+                            <input type="radio" id="webp-yes" class="admin__control-radio" name="webp-radio" value="1"/>
+                            <label class="admin__field-label" for="webp-yes">
+                                <b>Yes (default)</b> - Deliver WebP images to supported browsers.
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        <div class="admin__field field _required">
+                            <label for="webp_quality" class="admin__field-label">
+                                <span><?php /* @noEscape */ echo __("Default WebP (lossy) quality") ?></span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="value">
+                        <div class="admin__field field">
+                            <input name="webp-quality"
+                                   type="text"
+                                   required="required"
+                                   id="webp_quality"
+                                   class="admin__control-text
+                                    required-entry
+                                    validate-alphanum-with-spaces
+                                    validate-length
+                                    maximum-length-3">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        <div class="admin__field field _required">
+                            <label class="admin__field-label">
+                                <span><?php /* @noEscape */ echo __("Default JPEG format") ?></span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="value">
+                        <div class="admin__field admin__field-option">
+                            <input type="radio"
+                                   id="jpeg-format-auto"
+                                   class="admin__control-radio"
+                                   name="jpeg-format"
+                                   value="auto"/>
+                            <label class="admin__field-label" for="jpeg-format-auto">
+                                <b>Auto (default)</b> - Preserve the origin image JPEG format.
+                            </label>
+                        </div>
+                        <div class="admin__field admin__field-option">
+                            <input type="radio"
+                                   id="jpeg-format-baseline"
+                                   class="admin__control-radio"
+                                   name="jpeg-format"
+                                   value="baseline"/>
+                            <label class="admin__field-label" for="jpeg-format-baseline">
+                                <b>Baseline</b> - Display the image when it has fully downloaded.
+                            </label>
+                        </div>
+                        <div class="admin__field admin__field-option">
+                            <input type="radio"
+                                   id="jpeg-format-progressive"
+                                   class="admin__control-radio"
+                                   name="jpeg-format"
+                                   value="progressive"/>
+                            <label class="admin__field-label" for="jpeg-format-progressive">
+                                <b>Progressive</b> - Display the image using low resolution first,
+                                then incrementally improve the quality as downloading continues.
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        <div class="admin__field field _required">
+                            <label for="jpeg_quality" class="admin__field-label">
+                                <span><?php /* @noEscape */ echo __("Default JPEG quality") ?></span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="value">
+                        <div class="admin__field field">
+                            <input name="jpeg-quality"
+                                   type="text"
+                                   required="required"
+                                   id="jpeg_quality"
+                                   class="admin__control-text
+                                    required-entry
+                                    validate-alphanum-with-spaces
+                                    validate-length
+                                    maximum-length-3">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        <div class="admin__field field _required">
+                            <label class="admin__field-label">
+                                <span><?php /* @noEscape */ echo __("Allow upscaling?") ?></span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="value">
+                        <div class="admin__field admin__field-option">
+                            <input type="radio"
+                                   id="upscaling-no"
+                                   class="admin__control-radio"
+                                   name="upscaling-radio"
+                                   value="0"/>
+                            <label class="admin__field-label"
+                                   for="upscaling-no">
+                                <b>No (default)</b> - Recommended.
+                            </label>
+                        </div>
+                        <div class="admin__field admin__field-option">
+                            <input type="radio"
+                                   id="upscaling-yes"
+                                   class="admin__control-radio"
+                                   name="upscaling-radio"
+                                   value="1"/>
+                            <label class="admin__field-label" for="upscaling-yes">
+                                <b>Yes</b> - Allow upscaling.
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        <div class="admin__field field _required">
+                            <label class="admin__field-label">
+                                <span><?php /* @noEscape */ echo __("Resize filter") ?></span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="value">
+                        <div class="admin__field admin__field-option">
+                            <input type="radio"
+                                   id="resize-filter-lancsoz3"
+                                   class="admin__control-radio"
+                                   name="resize-filter-radio"
+                                   value="lanczos3"/>
+                            <label class="admin__field-label" for="resize-filter-lancsoz3">
+                                <b>Lancsoz3 (default)</b> - Use the Lanczos3 filter to increase the
+                                ability to detect edges and linear features within an image
+                                and uses sinc resampling to provide the best possible reconstruction.</label>
+                        </div>
+                        <div class="admin__field admin__field-option">
+                            <input type="radio"
+                                   id="resize-filter-lancsoz2"
+                                   class="admin__control-radio"
+                                   name="resize-filter-radio"
+                                   value="lanczos2"/>
+                            <label class="admin__field-label" for="resize-filter-lancsoz2">
+                                <b>Lanczos2</b> - Use the same filter as Lancsoz3 but with
+                                a less accurate approximation of the sinc resampling function.
+                            </label>
+                        </div>
+                        <div class="admin__field admin__field-option">
+                            <input type="radio"
+                                   id="resize-filter-bicubic"
+                                   class="admin__control-radio"
+                                   name="resize-filter-radio"
+                                   value="bicubic"/>
+                            <label class="admin__field-label" for="resize-filter-bicubic">
+                                <b>Bicubic</b> - Use an average of a 4x4 environment of pixels,
+                                weighing the innermost pixels higher.
+                            </label>
+                        </div>
+                        <div class="admin__field admin__field-option">
+                            <input type="radio"
+                                   id="resize-filter-bilinear"
+                                   class="admin__control-radio"
+                                   name="resize-filter-radio"
+                                   value="bilinear"/>
+                            <label class="admin__field-label" for="resize-filter-bilinear">
+                                <b>Bilinear</b> - Use an average of a 2x2 environment of pixels.
+                            </label>
+                        </div>
+                        <div class="admin__field admin__field-option">
+                            <input type="radio"
+                                   id="resize-filter-nearest"
+                                   class="admin__control-radio"
+                                   name="resize-filter-radio" value="nearest"/>
+                            <label class="admin__field-label" for="resize-filter-nearest">
+                                <b>Nearest</b> - Use the value of nearby translated pixel values.
+                            </label>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
@@ -385,9 +641,14 @@
     var upload_snippets_url = '<?php echo $this->getUrl('*/fastlyCdn/uploadVclSnippets');?>';
     var is_enabled = '<?php echo Mage::helper('fastlycdn')->isEnabled() ?>';
     var check_tls_url = '<?php echo $this->getUrl('*/fastlyCdn/checkTlsSetting');?>';
+    var check_io_url = '<?php echo $this->getUrl('*/fastlyCdn/checkIoSetting');?>';
+    var check_io_status_url = '<?php echo $this->getUrl('*/fastlyCdn/checkFastlyIoSetting');?>';
     var toggle_tls_url = '<?php echo $this->getUrl('*/fastlyCdn/toggleTls');?>';
+    var toggle_io_url = '<?php echo $this->getUrl('*/fastlyCdn/toggleIo');?>';
     var update_error_page_url = '<?php echo $this->getUrl('*/fastlyCdn/updateErrorPageHtml');?>';
     var get_error_page_resp_obj_url = '<?php echo $this->getUrl('*/fastlyCdn/getErrorPageRespObj');?>';
+    var get_io_config_resp_obj_url = '<?php echo $this->getUrl('*/fastlyCdn/getIoConfigRespObj');?>';
+    var update_io_config_url = '<?php echo $this->getUrl('*/fastlyCdn/updateIoConfig');?>';
     var get_backends_url = '<?php echo $this->getUrl('*/fastlyCdn/getBackends');?>';
     var update_backend_url = '<?php echo $this->getUrl('*/fastlyCdn/updateBackend');?>';
     var is_fpc_enabled = '<?php echo Mage::helper('fastlycdn')->isFpcEnabled() ?>';
