@@ -551,6 +551,50 @@ class Fastly_CDN_Model_Control
         return $result;
     }
 
+    /**
+     * Lists all IO default config options for a particular service and version
+     *
+     * @param $version
+     * @return bool|Zend_Http_Response
+     */
+    public function getIoDefaultConfigOptions($version)
+    {
+        $url = $this->_getApiServiceUri(). 'version/'. $version . '/io_settings';
+        $result = $this->_fetch($url, \Zend_Http_Client::GET);
+
+        return $result;
+    }
+
+    /**
+     * @param $params
+     * @param $version
+     * @return bool|Zend_Http_Response
+     */
+    public function configureIoConfigOptions($params, $version)
+    {
+        $url = $this->_getApiServiceUri(). 'version/'. $version . '/io_settings';
+        $result = $this->_fetch($url, \Zend_Http_Client::PATCH, $params);
+
+        return $result;
+    }
+
+    /**
+     * @return bool|Zend_Http_Response
+     */
+    public function checkImageOptimizationStatus()
+    {
+        $url = $this->_getApiServiceUri(). 'dynamic_io_settings';
+        $result = $this->_fetch($url, \Zend_Http_Client::GET);
+
+        return $result;
+    }
+
+    /**
+     * @param $params
+     * @param $version
+     * @param $old_name
+     * @return bool|Zend_Http_Response
+     */
     public function configureBackend($params, $version, $old_name)
     {
         $url = $this->_getApiServiceUri(). 'version/'. $version . '/backend/' . str_replace ( ' ', '%20', $old_name);
@@ -632,7 +676,7 @@ class Fastly_CDN_Model_Control
     {
         // set headers
 
-        if($test) {
+        if ($test) {
             $apiKey = $testApiKey;
         } else {
             $apiKey = Mage::helper('fastlycdn')->getApiKey();
@@ -640,10 +684,13 @@ class Fastly_CDN_Model_Control
 
         $headers = array(
             self::FASTLY_HEADER_AUTH  => $apiKey,
+            'Accept: application/json'
         );
 
-        if($verb == \Zend_Http_Client::PUT) {
+        if ($verb == \Zend_Http_Client::PUT) {
             array_push($headers, 'Content-Type: application/x-www-form-urlencoded');
+        } elseif ($verb == \Zend_Http_Client::PATCH) {
+            array_push($headers, 'Content-Type: text/json');
         }
 
         try {
@@ -652,22 +699,33 @@ class Fastly_CDN_Model_Control
             $client = new Zend_Http_Client();
             $client->setAdapter($adapter);
 
-            if($verb == \Zend_Http_Client::PUT) {
+            if ($verb == \Zend_Http_Client::PUT) {
                 $adapter->setConfig(array('curloptions' =>
                     array(
                         CURLOPT_CUSTOMREQUEST => 'PUT',
                         CURLOPT_POSTFIELDS => http_build_query($body)
                     )));
-            } elseif($verb == \Zend_Http_Client::DELETE) {
+            } elseif ($verb == \Zend_Http_Client::DELETE) {
                 $adapter->setConfig(array('curloptions' =>
                     array(
                         CURLOPT_CUSTOMREQUEST => 'DELETE',
                     )));
+            } elseif ($verb == \Zend_Http_Client::PATCH) {
+                $adapter->setConfig(array('curloptions' =>
+                    array(
+                        CURLOPT_CUSTOMREQUEST   => \Zend_Http_Client::PATCH,
+                        CURLOPT_POSTFIELDS      => $body
+                    )));
             }
 
             $client->setUri($uri)->setHeaders($headers);
-            if($body != '') {
-                $client->setParameterPost($body);
+
+            if ($body != '') {
+                if ($verb == \Zend_Http_Client::PATCH && !is_array($body)) {
+                    $client->setRawData($body, 'application/json');
+                } else {
+                    $client->setParameterPost($body);
+                }
             }
             // send request
             $response = $client->request($verb);

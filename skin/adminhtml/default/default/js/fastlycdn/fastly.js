@@ -10,6 +10,7 @@ document.observe("dom:loaded", function() {
         $('row_fastlycdn_general_test_connection').toggle(event.findElement().value);
         $('row_fastlycdn_general_upload_vcl').toggle(event.findElement().value);
         $('row_fastlycdn_general_toggle_tls').toggle(event.findElement().value);
+        $('row_fastlycdn_general_toggle_io').toggle(event.findElement().value);
     });
 
     if (is_enabled == true) {
@@ -18,7 +19,9 @@ document.observe("dom:loaded", function() {
         $('row_fastlycdn_general_test_connection').hide();
         $('row_fastlycdn_general_upload_vcl').hide();
         $('row_fastlycdn_general_toggle_tls').hide();
+        $('row_fastlycdn_general_toggle_io').hide();
         $('force_tls_state_unknown').show();
+        $('io_state_unknown').show();
     }
 
     /**
@@ -91,6 +94,10 @@ var Fastly = {
     tlsStatus: null,
     backends: null,
     backendId: null,
+    ioStatus: null,
+    ioServiceStatus: null,
+    tlsStatusText: 'on',
+    ioStatusText: 'on',
 
     loadDialogContent: {
         'vcl-upload-form-dialog': {
@@ -100,9 +107,21 @@ var Fastly = {
             }
         },
         'toggle-tls-form-dialog': {
-            title: 'We are about to turn '+ this.tlsStatusText + ' TLS',
+            title: 'We are about to turn toggle TLS',
             content: function () {
                 return $('toggle-tls-form').innerHTML;
+            }
+        },
+        'toggle-io-form-dialog': {
+            title: 'We are about to toggle Image Optimization',
+            content: function () {
+                return $('toggle-io-form').innerHTML;
+            }
+        },
+        'io-config-form-dialog': {
+            title: 'Update Image Optimization Default Config',
+            content: function () {
+                return $('io-config-form').innerHTML;
             }
         },
         'acl-create-form-dialog': {
@@ -211,6 +230,45 @@ var Fastly = {
                         }
                     });
 
+                    new Ajax.Request(check_io_status_url, {
+                        method:'post',
+                        loaderArea: false,
+                        onSuccess: function(transport) {
+                            var checkStatus = transport.responseText.evalJSON();
+                            this.ioServiceStatus = checkStatus.status;
+                            if (checkStatus.status == false) {
+                                $('fastly_toggle_io_btn').setAttribute('disabled', 'true');
+                                $('io_config_btn').setAttribute('disabled', 'true');
+                                $('toggle-io-btn-warning').show();
+                            }
+                        }.bind(this)
+                    });
+
+                    new Ajax.Request(check_io_url, {
+                        method:'post',
+                        loaderArea: false,
+                        parameters: {
+                            active_version: this.activeVersion
+                        },
+                        onCreate: function () {
+                            $('io-processing').show();
+                        },
+                        onSuccess: function(transport) {
+                            var checkReqSetting = transport.responseText.evalJSON();
+                            $('io-processing').hide();
+                            this.ioStatus = checkReqSetting.status;
+                            if (checkReqSetting.status != false) {
+                                $('io_state_enabled').show();
+                            } else {
+                                this.ioStatusText = 'off';
+                                $('io_state_disabled').show();
+                            }
+                        }.bind(this),
+                        onFailure: function() {
+                            $('io_state_unknown').show();
+                        }
+                    });
+
                     new Ajax.Request(get_backends_url, {
                         method:'post',
                         loaderArea: false,
@@ -253,6 +311,7 @@ var Fastly = {
                     });
                 } else {
                     $('force_tls_state_unknown').show();
+                    $('io_state_unknown').show();
                     $('backends-loading').hide();
                 }
             }.bind(this),
@@ -280,7 +339,7 @@ var Fastly = {
                 this.divId = divId;
 
                 // Hide message when showing Dictionary/Acl items
-                if(divId == 'dictionary-list-form' || divId == 'acl-list-form') {
+                if (divId == 'dictionary-list-form' || divId == 'acl-list-form') {
                     this.dialog = null;
                 }
 
@@ -292,8 +351,60 @@ var Fastly = {
                         },
                         onSuccess: function(transport) {
                             var response = transport.responseText.evalJSON();
-                            if(response.status != false) {
+                            if (response.status != false) {
                                 $('error-page-form-html').update(response.errorPageResp.content);
+                            }
+                        }.bind(this),
+                        onFailure: function() { alert('Something went wrong...'); }
+                    });
+                }
+
+                if (divId == 'io-config-form') {
+                    new Ajax.Request(get_io_config_resp_obj_url, {
+                        method: 'post',
+                        parameters: {
+                            active_version: this.service.active_version
+                        },
+                        onSuccess: function(transport) {
+                            var response = transport.responseText.evalJSON();
+                            if (response.status != false) {
+                                var ioDefaultConfig = response.ioConfigResp.data.attributes;
+
+                                if (ioDefaultConfig.webp == false) {
+                                    document.getElementById("webp-no").checked = true;
+                                } else {
+                                    document.getElementById("webp-yes").checked = true;
+                                }
+
+                                document.getElementById("webp_quality").value = ioDefaultConfig.webp_quality;
+
+                                if (ioDefaultConfig.jpeg_type === 'auto') {
+                                    document.getElementById("jpeg-format-auto").checked = true;
+                                } else if (ioDefaultConfig.jpeg_type === 'baseline') {
+                                    document.getElementById("jpeg-format-baseline").checked = true;
+                                } else {
+                                    document.getElementById("jpeg-format-progressive").checked = true;
+                                }
+
+                                document.getElementById("jpeg_quality").value = ioDefaultConfig.jpeg_quality;
+
+                                if (ioDefaultConfig.upscale === false) {
+                                    document.getElementById("upscaling-no").checked = true;
+                                } else {
+                                    document.getElementById("upscaling-yes").checked = true;
+                                }
+
+                                if (ioDefaultConfig.resize_filter === 'lanczos3') {
+                                    document.getElementById("resize-filter-lancsoz3").checked = true;
+                                } else if (ioDefaultConfig.resize_filter === 'lanczos2') {
+                                    document.getElementById("resize-filter-lancsoz2").checked = true;
+                                } else if (ioDefaultConfig.resize_filter === 'bicubic') {
+                                    document.getElementById("resize-filter-bicubic").checked = true;
+                                } else if (ioDefaultConfig.resize_filter === 'bilinear') {
+                                    document.getElementById("resize-filter-bilinear").checked = true;
+                                } else {
+                                    document.getElementById("resize-filter-nearest").checked = true;
+                                }
                             }
                         }.bind(this),
                         onFailure: function() { alert('Something went wrong...'); }
@@ -390,6 +501,47 @@ var Fastly = {
     },
 
     /**
+     * Turn on\off Image Optimization
+     */
+    toggleIo: function () {
+        var activate_flag = false;
+        if ($('toggle-io-form-activate').checked == true) {
+            activate_flag = true;
+        }
+        new Ajax.Request(toggle_io_url, {
+            method:'post',
+            parameters: {
+                active_version: this.service.active_version,
+                activate_flag: activate_flag
+            },
+            onSuccess: function(transport) {
+                var response = transport.responseText.evalJSON();
+                if(response.status == false) {
+                    return this.setDialogMessage(response.msg, this.divId, 'error');
+                }
+
+                var successMsg = '';
+                if(this.ioStatus) {
+                    this.ioStatus = false;
+                    successMsg = 'Image Optimization has been successfully turned off.';
+                    $('io_state_enabled').hide();
+                    $('io_state_disabled').show();
+
+                } else {
+                    this.ioStatus = true;
+                    successMsg = 'Image Optimization has been successfully turned on.';
+                    $('io_state_disabled').hide();
+                    $('io_state_enabled').show();
+                }
+
+                this.setButtonMsg(successMsg, 'toggle-io-btn-success');
+                this.closeDialogWindow();
+            }.bind(this),
+            onFailure: function() { alert('Something went wrong...'); }
+        });
+    },
+
+    /**
      * Update Error page content
      */
     updateErrorPage: function () {
@@ -422,6 +574,55 @@ var Fastly = {
 
                 var successMsg = 'Error page HTML is successfully updated.';
                 this.setButtonMsg(successMsg, 'error-page-btn-success');
+                this.closeDialogWindow();
+            }.bind(this),
+            onFailure: function() { alert('Something went wrong...'); }
+        });
+    },
+
+    updateIoConfig: function () {
+        var activate_flag = false;
+        if ($('io-config-form-activate').checked == true) {
+            activate_flag = true;
+        }
+        var webp = document.querySelector('input[name="webp-radio"]:checked').value;
+        var webp_quality = document.getElementById('webp_quality').value;
+        var jpeg_type = document.querySelector('input[name="jpeg-format"]:checked').value;
+        var jpeg_quality = document.getElementById('jpeg_quality').value;
+        var upscale = document.querySelector('input[name="upscaling-radio"]:checked').value;
+        var resize_filter = document.querySelector('input[name="resize-filter-radio"]:checked').value;
+
+        if (!isFinite(webp_quality) || !isFinite(jpeg_quality)) {
+            alert('Default WebP (lossy) quality and Default JPEG quality values must be numeric.');
+            return;
+        }
+
+        if (parseInt(webp_quality) < 0 || parseInt(webp_quality) > 100 || parseInt(jpeg_quality) < 0 || parseInt(jpeg_quality) > 100)
+        {
+            alert('WebP and JPEG quality values must be between 0 and 100');
+            return;
+        }
+
+        new Ajax.Request(update_io_config_url, {
+            method:'post',
+            parameters: {
+                active_version: this.service.active_version,
+                activate_flag: activate_flag,
+                webp: webp,
+                webp_quality: webp_quality,
+                jpeg_type: jpeg_type,
+                jpeg_quality: jpeg_quality,
+                upscale: upscale,
+                resize_filter: resize_filter
+            },
+            onSuccess: function(transport) {
+                var response = transport.responseText.evalJSON();
+                if (response.status == false) {
+                    return this.setDialogMessage(response.msg, this.divId, 'error');
+                }
+
+                var successMsg = 'Image Optimization Default Configuration is successfully updated.';
+                this.setButtonMsg(successMsg, 'io-config-btn-success');
                 this.closeDialogWindow();
             }.bind(this),
             onFailure: function() { alert('Something went wrong...'); }
