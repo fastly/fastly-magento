@@ -523,13 +523,13 @@ var Fastly = {
                 var successMsg = '';
                 if(this.ioStatus) {
                     this.ioStatus = false;
-                    successMsg = 'The Image Optimization request setting is successfully turned off.';
+                    successMsg = 'Image Optimization has been successfully turned off.';
                     $('io_state_enabled').hide();
                     $('io_state_disabled').show();
 
                 } else {
                     this.ioStatus = true;
-                    successMsg = 'The Image Optimization request setting is successfully turned on.';
+                    successMsg = 'Image Optimization has been successfully turned on.';
                     $('io_state_disabled').hide();
                     $('io_state_enabled').show();
                 }
