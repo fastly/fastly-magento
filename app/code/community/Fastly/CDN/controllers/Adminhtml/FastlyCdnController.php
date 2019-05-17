@@ -300,6 +300,27 @@ class Fastly_CDN_Adminhtml_FastlyCdnController extends Mage_Adminhtml_Controller
                 }
             }
 
+            $headerCondition = [
+                'name'      => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE .'_gzip_safety',
+                'statement' => 'beresp.http.x-esi',
+                'type'      => 'CACHE',
+                'priority'  => 100
+            ];
+
+            $createHeaderCondition = $control->createCondition($clone->number, $headerCondition);
+
+            $headerData = [
+                'name'              => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE . '_gzip_safety',
+                'type'              => 'cache',
+                'dst'               => 'gzip',
+                'action'            => 'set',
+                'priority'          => 1000,
+                'src'               => 'false',
+                'cache_condition'   => $createHeaderCondition->name
+            ];
+
+            $control->createHeader($clone->number, $headerData);
+
             $condition = array('name' => Fastly_CDN_Model_Config::FASTLY_MAGENTO_MODULE.'_pass', 'statement' => 'req.http.x-pass', 'type' => 'REQUEST', 'priority' => 90);
             $createCondition = $control->createCondition($clone->number, $condition);
 
