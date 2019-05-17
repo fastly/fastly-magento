@@ -890,4 +890,41 @@ class Fastly_CDN_Model_Control
 
         return $result;
     }
+
+    /**
+     * @param $version
+     * @param array $condition
+     * @return bool|Zend_Http_Response
+     */
+    public function createHeader($version, array $condition)
+    {
+        $checkIfExists = $this->getHeader($version, $condition['name']);
+        $url = $this->_getApiServiceUri(). 'version/' .$version. '/header';
+
+        if ($checkIfExists === false) {
+            $verb = \Zend_Http_Client::POST;
+        } else {
+            $verb = \Zend_Http_Client::PUT;
+            $url .= '/'.$condition['name'];
+        }
+
+        $result = $this->_fetch($url, $verb, $condition);
+
+        return $result;
+    }
+
+    /**
+     * @param $version
+     * @param $name
+     * @return bool|Zend_Http_Response
+     */
+    public function getHeader($version, $name)
+    {
+        $url = $this->_getApiServiceUri(). 'version/'. $version. '/header/' . $name;
+        $verb = \Zend_Http_Client::GET;
+
+        $result = $this->_fetch($url, $verb);
+
+        return $result;
+    }
 }
