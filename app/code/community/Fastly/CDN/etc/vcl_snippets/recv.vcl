@@ -71,8 +71,9 @@
 
     # formkey lookup
     if (req.url.path ~ "/fastlycdn/getformkey/") {
-        # check if we have a formkey cookie
-        if (req.http.Cookie:FASTLY_CDN_FORMKEY) {
+        # check if we have a formkey cookie and that it's validly formed
+        if (req.http.Cookie:FASTLY_CDN_FORMKEY &&
+std.strlen(req.http.Cookie:FASTLY_CDN_FORMKEY) < 40 && req.http.Cookie:FASTLY_CDN_FORMKEY ~ "^[a-zA-Z0-9-_]*$" )  {
             set req.http.Formkey = req.http.Cookie:FASTLY_CDN_FORMKEY;
         } else {
             # create formkey
