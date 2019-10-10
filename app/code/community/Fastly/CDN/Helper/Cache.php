@@ -245,7 +245,7 @@ class Fastly_CDN_Helper_Cache extends Mage_Core_Helper_Abstract
         // This page potentially has ESIs so as a first cut let's mark it as such
         $response->setHeader("X-Esi", "1");
 
-        $response->setHeader("Fastly-Module-Enabled", "1.0.29", true);
+        $response->setHeader("Fastly-Module-Enabled", "1.0.30", true);
     }
 
     /**
