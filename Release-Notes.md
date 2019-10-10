@@ -1,5 +1,13 @@
 # Fastly_Cdn Release Notes
 
+## 1.0.30
+
+- Add FormKey validation
+
+## 1.0.29
+
+- Add VCL to protect against inadvertent gzipping ESIs
+
 ## 1.0.28
 
 - Add Image Optimization UI
