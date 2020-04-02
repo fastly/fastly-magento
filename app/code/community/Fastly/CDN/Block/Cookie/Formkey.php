@@ -25,7 +25,7 @@ class Fastly_CDN_Block_Cookie_Formkey extends Mage_Core_Block_Template
     {
         // set default cache lifetime and cache tags
         $this->addData(array(
-            'cache_lifetime'    => false
+            'cache_lifetime'    => null
        ));
     }
 
