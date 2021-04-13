@@ -61,6 +61,8 @@
         set req.esi = false;
         # Needed for proper handling of stale while revalidated when shielding is involved
         set req.max_stale_while_revalidate = 0s;
+    } else {
+        set esi.allow_inside_cdata = true;
     }
 
     # static files are always cacheable. remove SSL flag and cookie
