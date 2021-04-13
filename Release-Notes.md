@@ -1,5 +1,9 @@
 # Fastly_Cdn Release Notes
 
+## 1.0.32
+
+- Enable processing of ESIs inside CDATA
+
 ## 1.0.31
 
 - Fix for https://github.com/fastly/fastly-magento/issues/50
